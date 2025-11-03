@@ -8,10 +8,18 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import FloatingParticles from "@/components/effects/FloatingParticles";
-import ThreeNeuralBackground from "@/components/effects/ThreeNeuralBackground";
-import AIChatbot from "@/components/ui/AIChatbot";
+// import ThreeNeuralBackground from "@/components/effects/ThreeNeuralBackground";
+// import AIChatbot from "@/components/ui/AIChatbot";
 import { LottieIcon } from "@/components/ui/LottieIcon";
 import FeaturedSlider from "@/components/slider/FeaturedSlider";
+
+// وارد کردن ابزارهای لازم برای اتصال به بک‌اند
+import { useQuery } from "@tanstack/react-query";
+// import axios from "axios";
+import api from '@/lib/axiosConfig';
+import { Skeleton } from "@/components/ui/skeleton";
+
+// وارد کردن انیمیشن‌ها (مانند قبل)
 import eyeBlinkingAnimation from "@/assets/animations/eye-blinking.json";
 import brainAnimation from "@/assets/animations/Brain.json";
 import networkAnimation from "@/assets/animations/Network.json";
@@ -19,50 +27,54 @@ import chatAnimation from "@/assets/animations/Chatbot-typing.json";
 import faceAnimation from "@/assets/animations/Face-Recognition.json";
 import aiAnimation from "@/assets/animations/AI animation.json";
 import aicoreAnimation from "@/assets/animations/ai core.json";
+import IdeaBulbAnimation from "@/assets/animations/Inspiration.json";
+import SecurityAnimation from "@/assets/animations/Security.json";
+import lightingAnimation from "@/assets/animations/lighting.json";
+import globeAnimation from "@/assets/animations/Globe.json";
+
+// تعریف Interface برای نوع داده پروژه
+interface Project {
+  _id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  category: string;
+  image?: string; // تصویر را اختیاری در نظر می‌گیریم
+}
+
+// تابع برای دریافت پروژه‌های ویژه از API
+const fetchFeaturedProjects = async (): Promise<Project[]> => {
+  const { data } = await api.get('/projects');
+  // پروژه‌هایی که isFeatured هستند را فیلتر کرده و فقط ۴ تای اول را برمی‌گردانیم
+  return data.filter((p: any) => p.isFeatured).slice(0, 4);
+};
+
 
 const Home = () => {
   const { t } = useTranslation();
   
-  // Sample data for the featured content slider
-  const featuredSlides = [
-    {
-      id: 1,
-      image: "https://picsum.photos/1200/600?random=10",
-      title: "Quantum AI Breakthrough",
-      description: "Revolutionary quantum machine learning algorithms that process information at unprecedented speeds, opening new possibilities for complex problem solving.",
-      category: "Research",
-      buttonText: "Read Research Paper",
-      buttonLink: "/research"
-    },
-    {
-      id: 2,
-      image: "https://picsum.photos/1200/600?random=11",
-      title: "Autonomous Systems",
-      description: "Next-generation self-driving technology powered by advanced neural networks that adapt and learn from real-world scenarios in real-time.",
-      category: "Innovation",
-      buttonText: "Explore Technology",
-      buttonLink: "/projects"
-    },
-    {
-      id: 3,
-      image: "https://picsum.photos/1200/600?random=12",
-      title: "AI Ethics Framework",
-      description: "Comprehensive ethical guidelines and frameworks ensuring responsible AI development that benefits humanity while maintaining transparency and fairness.",
-      category: "Ethics",
-      buttonText: "Learn More",
-      buttonLink: "/about"
-    },
-    {
-      id: 4,
-      image: "https://picsum.photos/1200/600?random=13",
-      title: "Edge Computing AI",
-      description: "Lightweight AI models optimized for edge devices, bringing intelligent processing to IoT sensors, mobile devices, and embedded systems.",
-      category: "Technology",
-      buttonText: "View Solutions",
-      buttonLink: "/projects"
-    }
-  ];
-  
+  // استفاده از useQuery برای دریافت و مدیریت داده‌های پروژه‌های ویژه
+  const { 
+    data: featuredProjects, 
+    isLoading: isLoadingProjects, 
+    isError: isErrorProjects 
+  } = useQuery({
+    queryKey: ['featuredProjects'],
+    queryFn: fetchFeaturedProjects,
+  });
+
+  // تبدیل داده‌های دریافت شده به فرمت مورد نیاز اسلایدر
+  const featuredSlides = featuredProjects?.map((project, index) => ({
+    // <<-- FIX IS HERE: Use the array index as a numeric ID
+    id: index + 1,
+    image: project.image || `https://picsum.photos/1200/600?random=${project._id}`,
+    title: project.title,
+    description: project.summary,
+    category: project.category,
+    buttonText: "View Project Details",
+    buttonLink: `/projects/${project.slug}`
+  }));
+
   const fadeInUp = {
     initial: { opacity: 0, y: 60 },
     whileInView: { opacity: 1, y: 0 },
@@ -79,22 +91,22 @@ const Home = () => {
   // About cards data
   const aboutCards = [
     {
-      animationData:aiAnimation,
+      animationData:IdeaBulbAnimation,
       title: "Innovation First",
       description: "Pushing the boundaries of artificial intelligence to solve complex real-world challenges with cutting-edge research."
     },
     {
-      animationData:aiAnimation,
+      animationData:SecurityAnimation,
       title: "Trust & Security",
       description: "Enterprise-grade security and ethical AI practices ensure your data and systems remain protected at all times."
     },
     {
-      animationData:aiAnimation,
+      animationData:lightingAnimation,
       title: "Lightning Fast",
       description: "Optimized algorithms and scalable infrastructure deliver real-time AI insights without compromise."
     },
     {
-      animationData:aiAnimation,
+      animationData:globeAnimation,
       title: "Global Impact",
       description: "Serving organizations across 50+ countries with AI solutions that transform industries worldwide."
     }
@@ -151,31 +163,14 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen overflow-hidden">
+    <div className="min-h-screen overflow-hidden bg-transparent">
       {/* AI Chatbot with enhanced floating button */}
-      <AIChatbot />
+      {/* <AIChatbot /> */}
       
-      {/* Hero Section - Cinematic with 3D Background */}
+      {/* Hero Section - (بدون تغییر) */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <ThreeNeuralBackground />
+        {/* <ThreeNeuralBackground /> */}
         <FloatingParticles count={80} />
-        
-        {/* Enhanced gradient overlay for better text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/60 to-background z-0" />
-        
-        {/* AI Animation - Decorative Elements */}
-        {/* <motion.div
-          className="absolute top-20 right-10 z-5"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
-        >
-          <LottieIcon 
-            animationData={aiAnimation}
-            size={250}
-          />
-        </motion.div> */}
-
         <motion.div
           className="absolute top-1/3 right-1/2 transform -translate-x-1/2 -translate-y-1/2 z-5"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -252,8 +247,6 @@ const Home = () => {
             </motion.div>
           </motion.div>
         </div>
-
-        {/* Animated scroll indicator */}
         <motion.div
           className="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-10"
           initial={{ opacity: 0, y: -20 }}
@@ -266,17 +259,35 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* Featured Content Slider Section */}
-      <FeaturedSlider 
-        slides={featuredSlides}
-        autoPlay={true}
-        autoPlayInterval={7000}
-        showNavigation={true}
-        showPagination={true}
-        showPlayPause={true}
-      />
+      {/* Featured Content Slider Section - DYNAMIC */}
+      {isLoadingProjects && (
+        <section className="py-16">
+          <div className="container mx-auto px-6">
+            <Skeleton className="w-full h-[500px] rounded-lg" />
+          </div>
+        </section>
+      )}
 
-      {/* About Section - Mission, Values, Innovation */}
+      {isErrorProjects && (
+        <section className="py-16">
+          <div className="container mx-auto px-6 text-center">
+            <p className="text-red-500">Failed to load featured content. Please try again later.</p>
+          </div>
+        </section>
+      )}
+
+      {featuredSlides && featuredSlides.length > 0 && (
+        <FeaturedSlider 
+          slides={featuredSlides}
+          autoPlay={true}
+          autoPlayInterval={7000}
+          showNavigation={true}
+          showPagination={true}
+          showPlayPause={true}
+        />
+      )}
+
+      {/* About Section - (بدون تغییر) */}
       <section className="py-32 relative">
         <div className="container mx-auto px-6">
           <motion.div
@@ -384,52 +395,6 @@ const Home = () => {
       </section>
 
       
-      {/* Testimonials Section */}
-      <section className="py-32 relative overflow-hidden">
-        <FloatingParticles count={40} />
-        
-        <div className="container mx-auto px-6">
-          <motion.div
-            {...fadeInUp}
-            className="text-center mb-20"
-          >
-            <Badge variant="outline" className="mb-4 border-accent/30 text-accent">
-              Success Stories
-            </Badge>
-            <h2 className="text-4xl md:text-6xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent">
-                Trusted by Leaders
-              </span>
-            </h2>
-          </motion.div>
-
-          <motion.div 
-            {...staggerContainer}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          >
-            {testimonials.map((testimonial, index) => (
-              <motion.div key={testimonial.author} {...fadeInUp}>
-                <Card className="glass-card h-full group">
-                  <CardContent className="p-8">
-                    <Quote className="h-8 w-8 text-primary/30 mb-6" />
-                    <p className="text-lg text-muted-foreground mb-8 leading-relaxed italic">
-                      "{testimonial.quote}"
-                    </p>
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent" />
-                      <div>
-                        <p className="font-bold text-foreground">{testimonial.author}</p>
-                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
       {/* Final CTA Section */}
       <section className="py-32 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />

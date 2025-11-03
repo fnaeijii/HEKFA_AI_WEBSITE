@@ -40,8 +40,8 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative mt-32 border-t border-border/50">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50" />
+    <footer className="relative mt-32 border-t border-border/50 bg-slate-900 text-gray-300">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-900/50" />
       
       <div className="relative container mx-auto px-6 py-16">
         {/* Main Footer Content */}
@@ -54,29 +54,29 @@ const Footer = () => {
                 <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300" />
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl font-bold glow-text">Hekfa</span>
-                <span className="text-sm text-muted-foreground font-mono">
+                <span className="text-2xl font-bold glow-text text-gray-100">Hekfa</span>
+                <span className="text-sm text-gray-400 font-mono">
                   AI Division
                 </span>
               </div>
             </Link>
             
-            <p className="text-muted-foreground mb-6 leading-relaxed">
+            <p className="text-gray-400 mb-6 leading-relaxed">
               Pioneering the future of artificial intelligence through cutting-edge 
               research in neural networks, machine learning, and computer vision 
               technologies that transform industries worldwide.
             </p>
 
             <div className="space-y-3">
-              <div className="flex items-center space-x-3 text-muted-foreground">
+              <div className="flex items-center space-x-3 text-gray-400">
                 <Mail className="h-4 w-4 text-primary" />
                 <span>contact@hekfa.ai</span>
               </div>
-              <div className="flex items-center space-x-3 text-muted-foreground">
+              <div className="flex items-center space-x-3 text-gray-400">
                 <Phone className="h-4 w-4 text-primary" />
                 <span>+1 (555) 123-4567</span>
               </div>
-              <div className="flex items-center space-x-3 text-muted-foreground">
+              <div className="flex items-center space-x-3 text-gray-400">
                 <MapPin className="h-4 w-4 text-primary" />
                 <span>San Francisco, CA</span>
               </div>
@@ -85,13 +85,13 @@ const Footer = () => {
 
           {/* Company Links */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Company</h3>
+            <h3 className="font-semibold text-gray-100 mb-4">Company</h3>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    className="text-muted-foreground hover:text-primary transition-colors duration-300"
+                    className="text-gray-400 hover:text-primary transition-colors duration-300"
                   >
                     {link.name}
                   </Link>
@@ -102,13 +102,13 @@ const Footer = () => {
 
           {/* Solutions Links */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Solutions</h3>
+            <h3 className="font-semibold text-gray-100 mb-4">Solutions</h3>
             <ul className="space-y-3">
               {footerLinks.solutions.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    className="text-muted-foreground hover:text-primary transition-colors duration-300"
+                    className="text-gray-400 hover:text-primary transition-colors duration-300"
                   >
                     {link.name}
                   </Link>
@@ -119,13 +119,13 @@ const Footer = () => {
 
           {/* Resources Links */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Resources</h3>
+            <h3 className="font-semibold text-gray-100 mb-4">Resources</h3>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    className="text-muted-foreground hover:text-primary transition-colors duration-300"
+                    className="text-gray-400 hover:text-primary transition-colors duration-300"
                   >
                     {link.name}
                   </Link>
@@ -136,13 +136,13 @@ const Footer = () => {
 
           {/* Legal Links */}
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Legal</h3>
+            <h3 className="font-semibold text-gray-100 mb-4">Legal</h3>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    className="text-muted-foreground hover:text-primary transition-colors duration-300"
+                    className="text-gray-400 hover:text-primary transition-colors duration-300"
                   >
                     {link.name}
                   </Link>
@@ -156,7 +156,7 @@ const Footer = () => {
 
         {/* Bottom Footer */}
         <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0">
-          <div className="text-muted-foreground text-sm">
+          <div className="text-gray-400 text-sm">
             © {currentYear} Hekfa AI Division. All rights reserved.
           </div>
 
@@ -176,7 +176,7 @@ const Footer = () => {
                   rel="noopener noreferrer"
                   aria-label={social.name}
                 >
-                  <social.icon className="h-4 w-4" />
+                  <social.icon className="h-4 w-4 text-gray-300" />
                 </a>
               </Button>
             ))}
@@ -184,7 +184,7 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-muted-foreground">Stay updated:</span>
+            <span className="text-sm text-gray-400">Stay updated:</span>
             <Button variant="outline" size="sm" className="btn-ghost-neural">
               Subscribe
             </Button>
