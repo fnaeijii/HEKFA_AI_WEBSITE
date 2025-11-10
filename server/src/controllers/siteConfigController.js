@@ -4,7 +4,6 @@ const SiteConfig = require('../models/SiteConfigModel');
 // @route   GET /api/config
 // @access  Public
 const getConfig = async (req, res) => {
-  // این تابع نیازی به تغییر ندارد
   try {
     let config = await SiteConfig.findOne({ configName: 'default' });
     if (!config) {
@@ -21,12 +20,10 @@ const getConfig = async (req, res) => {
 // @access  Private (Admin)
 const updateConfig = async (req, res) => {
   try {
-    // <<-- ۳. فیلد جدید را از body دریافت کنید -->>
     const { researchStats, companyStats, contactInfo, globalOffices } = req.body;
 
     const config = await SiteConfig.findOneAndUpdate(
       { configName: 'default' },
-      // <<-- ۴. فیلد جدید را در آبجکت آپدیت قرار دهید -->>
       { researchStats, companyStats, contactInfo, globalOffices },
       {
         new: true,

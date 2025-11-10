@@ -46,13 +46,10 @@ const addTeamMember = async (newMember: NewTeamMemberData): Promise<TeamMember> 
   return data;
 };
 
-// <<<<<<<<<<<<<<<<<<<<<<<<   تغییر کلیدی اینجاست   >>>>>>>>>>>>>>>>>>>>>>>>>>
 const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('image', file);
     const { data } = await api.post(`/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-    // قبلاً: return data.filePath;
-    // اصلاح: بر اساس کد بک‌اند شما، باید از data.url استفاده کنیم
     return data.url; 
 };
 

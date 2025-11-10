@@ -6,19 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogIn } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+// import axios from 'axios';
+import api from '@/lib/axiosConfig'; // <--- این خط را اضافه کنید
 import { toast } from "sonner";
 
 const LoginPage = () => {
   const [email, setEmail] = useState('admin@example.com');
   const [password, setPassword] = useState('123456');
-  const navigate = useNavigate();
+  const navigate = useNavigate();ز
 
   const { mutate: loginUser, isPending: isLoading } = useMutation({
     mutationFn: (credentials: { email: string, password: string }) => {
-      // <<-- اصلاح نهایی اینجاست: /api اضافی حذف شد -->>
-      // چون VITE_API_URL شما خودش /api را دارد
-      return axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, credentials);
+      return api.post('/auth/login', credentials); // <-- کد صحیح
     },
 
     onSuccess: (response) => {
@@ -43,7 +42,6 @@ const LoginPage = () => {
   };
 
   return (
-    // JSX بدون تغییر باقی می‌ماند ...
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="mx-auto max-w-sm w-full">
         <CardHeader className="text-center">

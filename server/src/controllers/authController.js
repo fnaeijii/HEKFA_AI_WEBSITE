@@ -2,10 +2,9 @@
 const User = require('../models/UserModel');
 const jwt = require('jsonwebtoken');
 
-// تابع برای ساخت توکن
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d', // توکن تا ۳۰ روز معتبر است
+    expiresIn: '30d',
   });
 };
 
@@ -16,10 +15,7 @@ const loginAdmin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // پیدا کردن کاربر با ایمیل
     const user = await User.findOne({ email });
-
-    // چک کردن وجود کاربر و تطابق پسورد
     if (user && (await user.matchPassword(password))) {
       res.json({
         _id: user._id,

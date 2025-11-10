@@ -39,19 +39,19 @@ const createSlug = (title: string): string => {
 
 // --- API Functions for Posts ---
 const fetchPosts = async (): Promise<Post[]> => {
-  const { data } = await api.get('/posts'); // <<-- تغییر: /research به /posts
+  const { data } = await api.get('/posts');
   return data;
 };
 
 const addPost = async (newPost: Omit<Post, '_id' | 'content'>): Promise<Post> => {
   // Assuming content is not mandatory for initial list view, but required for creation
   const postData = { ...newPost, content: newPost.summary }; // Default content to summary for now
-  const { data } = await api.post('/posts', postData); // <<-- تغییر: /research به /posts
+  const { data } = await api.post('/posts', postData); 
   return data;
 };
 
 const deletePost = async (slug: string): Promise<void> => {
-  await api.delete(`/posts/${slug}`); // <<-- تغییر: استفاده از slug به جای id
+  await api.delete(`/posts/${slug}`);
 };
 
 // --- Component ---
@@ -78,7 +78,7 @@ const ManageResearchPage = () => {
   const queryClient = useQueryClient();
 
   const { data: posts, isLoading, isError, error } = useQuery({
-    queryKey: ['posts'], // <<-- تغییر: queryKey به posts
+    queryKey: ['posts'],
     queryFn: fetchPosts,
   });
 

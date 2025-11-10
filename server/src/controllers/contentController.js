@@ -36,11 +36,9 @@ const upsertContent = async (req, res) => {
   try {
     const { key } = req.params;
     const { value, description } = req.body;
-
-    // گزینه‌ی upsert: if the record exists, update it. if not, create it.
     const options = {
-      new: true, // برگرداندن سند جدید/آپدیت شده
-      upsert: true, // مهم‌ترین بخش: اگر پیدا نشد، ایجاد کن
+      new: true, 
+      upsert: true,
       runValidators: true,
     };
 

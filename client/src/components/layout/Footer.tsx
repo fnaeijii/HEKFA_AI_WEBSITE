@@ -48,18 +48,22 @@ const Footer = () => {
         <div className="grid grid-cols-1 lg:grid-cols-6 gap-12 mb-12">
           {/* Company Info */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center space-x-3 mb-6 group">
-              <div className="relative">
-                <Brain className="h-10 w-10 text-primary animate-glow-pulse" />
-                <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-2xl font-bold glow-text text-gray-100">Hekfa</span>
-                <span className="text-sm text-gray-400 font-mono">
-                  AI Division
-                </span>
-              </div>
-            </Link>
+            <Link to="/" className="flex items-center space-x-3 group">
+            <div className="relative">
+              <img
+                src="/images/CBRN-LOGO-SAIT-2-1024x414.png" 
+                alt="Hekfa Logo"
+                className="h-8 w-8 object-contain"
+              />
+              <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold glow-text">Hekfa</span>
+              <span className="text-xs text-muted-foreground font-mono">
+                AI Division
+              </span>
+            </div>
+          </Link>
             
             <p className="text-gray-400 mb-6 leading-relaxed">
               Pioneering the future of artificial intelligence through cutting-edge 

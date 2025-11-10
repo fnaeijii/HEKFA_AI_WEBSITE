@@ -55,7 +55,12 @@ const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="relative">
-              <Brain className="h-8 w-8 text-primary animate-glow-pulse" />
+              {/* تگ Brain با تگ img جایگزین شده است */}
+              <img
+                src="/images/CBRN-LOGO-SAIT-2-1024x414.png" // <-- مسیر عکس شرکت خود را اینجا قرار دهید
+                alt="Hekfa Logo" // <-- یک متن جایگزین مناسب بنویسید
+                className="h-8 w-8 object-contain" // <-- کلاس‌های اندازه (h-8 w-8) حفظ شده‌اند
+              />
               <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300" />
             </div>
             <div className="flex flex-col">
@@ -117,7 +122,9 @@ const Navigation = () => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button className="btn-neural">{t('nav.getStarted')}</Button>
+            <Link to="/contact">
+              <Button className="btn-neural">{t('nav.getStarted')}</Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -177,8 +184,9 @@ const Navigation = () => {
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <Button className="btn-neural">{t('nav.getStarted')}</Button>
-                </div>
+                  <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="btn-neural">{t('nav.getStarted')}</Button>
+                  </Link>                </div>
               </div>
             </motion.div>
           )}

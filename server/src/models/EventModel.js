@@ -20,7 +20,7 @@ const eventSchema = new mongoose.Schema(
       type: String,
       required: [true, 'A short description is required'],
     },
-    boothNumber: { // فیلد جدید برای شماره غرفه
+    boothNumber: {
         type: String,
         trim: true,
     },
@@ -28,7 +28,7 @@ const eventSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    isActive: { // برای کنترل نمایش رویدادهای قدیمی
+    isActive: {
         type: Boolean,
         default: true,
     }

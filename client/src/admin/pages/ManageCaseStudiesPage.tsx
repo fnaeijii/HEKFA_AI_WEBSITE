@@ -15,7 +15,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { AlertTriangle, PlusCircle, MoreHorizontal, Trash2, Edit } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 
-// <<-- 1. اینترفیس دقیقاً مطابق با CaseStudyModel -->>
 interface CaseStudy {
   _id: string;
   title: string;
@@ -57,7 +56,6 @@ const deleteCaseStudy = async (slug: string): Promise<void> => {
 // --- Component ---
 const ManageCaseStudiesPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  // <<-- 2. State های فرم بر اساس مدل جدید -->>
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [client, setClient] = useState('');
@@ -84,7 +82,6 @@ const ManageCaseStudiesPage = () => {
       const technologiesArray = technologies.split(',').map(tech => tech.trim());
       const resultsArray = results.split(',').map(res => res.trim());
       
-      // <<-- 3. Payload ارسالی کاملاً با بک‌اند هماهنگ شد -->>
       return addCaseStudy({ 
         title, slug, client, description, imageUrl,
         technologies: technologiesArray,
@@ -118,7 +115,6 @@ const ManageCaseStudiesPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // <<-- 4. اعتبارسنجی فیلدهای الزامی -->>
     if (!title || !slug || !client || !description || !technologies || !results || !imageFile) {
       toast.error('All required fields (*) must be filled.');
       return;
@@ -144,7 +140,6 @@ const ManageCaseStudiesPage = () => {
               <DialogDescription>Fill in the details for the new case study.</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
-              {/* <<-- 5. فرم با فیلدهای جدید به‌روز شد -->> */}
               <div className="grid gap-4 py-4">
                 <InputWithLabel id="title" label="Title" value={title} onChange={e => setTitle(e.target.value)} required />
                 <InputWithLabel id="slug" label="Slug" value={slug} onChange={e => setSlug(e.target.value)} required description="Auto-generated from title." />
@@ -198,7 +193,6 @@ const ManageCaseStudiesPage = () => {
                         <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This will permanently delete the case study: "{study.title}".</AlertDialogDescription></AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          {/* <<-- 6. تابع حذف با slug فراخوانی می‌شود -->> */}
                           <AlertDialogAction onClick={() => removeCaseStudy(study.slug)} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -227,7 +221,6 @@ const InputWithLabel = ({ id, label, value, onChange, type = "text", required = 
     </div>
 );
 
-// <<-- نکته: برای 'results' از Textarea استفاده کردیم تا فضای بیشتری داشته باشد -->>
 const TextareaWithLabel = ({ id, label, value, onChange, required = false, description = "" }) => (
     <div className="grid grid-cols-4 items-start gap-4">
         <Label htmlFor={id} className="text-right mt-2">{label} {required && <span className="text-red-500">*</span>}</Label>

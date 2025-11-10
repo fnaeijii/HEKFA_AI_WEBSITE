@@ -26,13 +26,12 @@ const postSchema = new mongoose.Schema(
     mainImageUrl: {
       type: String,
     },
-    // --- فیلدهای جدید برای بخش تحقیقات ---
-    authors: [{ type: String }],             // <<-- این خط را اضافه کن
-    journal: { type: String },                // <<-- این خط را اضافه کن
-    publishedAt: { type: Date, default: Date.now }, // <<-- این خط را اضافه کن
-    citations: { type: Number, default: 0 },  // <<-- این خط را اضافه کن
-    downloadUrl: { type: String },            // <<-- این خط را اضافه کن
-    // ------------------------------------
+    
+    authors: [{ type: String }],
+    journal: { type: String },
+    publishedAt: { type: Date, default: Date.now },
+    citations: { type: Number, default: 0 },
+    downloadUrl: { type: String },          
 
     category: {
       type: String,
@@ -45,7 +44,7 @@ const postSchema = new mongoose.Schema(
     author: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: 'User', // <<-- این خط مدل Post را به مدل User متصل می‌کند
+      ref: 'User',
     },
     status: {
       type: String,
@@ -54,7 +53,7 @@ const postSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // createdAt و updatedAt
+    timestamps: true, 
   }
 );
 

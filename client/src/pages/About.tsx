@@ -106,7 +106,7 @@ const About = () => {
                 );
               })}
           </div>
-        </div> {/* <<--- این تگ پایانی فراموش شده بود و حالا اضافه شده است --->> */}
+        </div>
       </section>
 
       {/* Mission Section */}
@@ -121,7 +121,7 @@ const About = () => {
               <Button asChild className="btn-neural"><Link to="/projects">Explore Our Work</Link></Button>
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="relative">
-              <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl relative overflow-hidden"><div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" /><FloatingParticles count={15} /><div className="absolute inset-0 flex items-center justify-center"><Brain className="h-32 w-32 text-primary/60" /></div></div>
+              <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl relative overflow-hidden"><div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" /><FloatingParticles count={15} /><div className="absolute inset-0 flex items-center justify-center"><img src="/images/unnamed.jpg" alt="hello" /></div></div>
             </motion.div>
           </div>
         </div>
@@ -147,7 +147,56 @@ const About = () => {
       <section className="py-20 relative"><FloatingParticles count={20} /><div className="container mx-auto px-6 text-center"><motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}><h2 className="text-3xl md:text-4xl font-bold mb-6 glow-text">Join Us in Shaping the Future</h2><p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">Whether you're looking to collaborate, join our team, or transform your business with AI, we'd love to hear from you.</p><div className="flex flex-col sm:flex-row gap-4 justify-center"><Button asChild className="btn-neural"><Link to="/contact">Contact Us</Link></Button><Button asChild variant="outline" className="btn-ghost-neural"><Link to="/research">View Our Research</Link></Button></div></motion.div></div></section>
       
       {/* Upcoming Events Section */}
-      <section className="py-20 relative" id="events"><div className="container mx-auto px-6"><motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-16"><h2 className="text-3xl md:text-4xl font-bold mb-4 glow-text-secondary">Join Us at Upcoming Events</h2><p className="text-lg text-muted-foreground max-w-2xl mx-auto">We actively participate in leading industry conferences and workshops. Connect with us and see our technology in action.</p></motion.div>{loading && (<div className="space-y-6">{[...Array(2)].map((_, i) => (<Card key={i} className="neural-card"><CardContent className="p-6"><Skeleton className="h-24 w-full" /></CardContent></Card>))}</div>)}{error && <p className="text-center text-red-500 text-lg">{error}</p>}{!loading && !error && events.length > 0 && (<div className="max-w-4xl mx-auto space-y-6">{events.map((event, index) => (<motion.div key={event._id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: index * 0.1 }}><Card className="neural-card"><CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-start"><div className="flex-1"><h3 className="text-xl font-bold mb-2">{event.title}</h3><div className="flex flex-col sm:flex-row sm:items-center gap-x-6 gap-y-2 text-muted-foreground text-sm mb-4"><span className="flex items-center"><CalendarDays className="h-4 w-4 mr-2 text-primary" />{new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span><span className="flex items-center"><MapPin className="h-4 w-4 mr-2 text-primary" />{event.location}</span>{event.boothNumber && <span className="flex items-center"><Building2 className="h-4 w-4 mr-2 text-primary" />Booth: {event.boothNumber}</span>}</div><p className="text-muted-foreground leading-relaxed">{event.description}</p></div>{event.registrationUrl && (<div className="mt-4 md:mt-0 md:ml-6 flex-shrink-0"><Button asChild className="btn-neural"><a href={event.registrationUrl} target="_blank" rel="noopener noreferrer">Register Now</a></Button></div>)}</CardContent></Card></motion.div>))}</div>)}{!loading && !error && events.length === 0 && (<p className="text-center text-muted-foreground text-lg">There are no upcoming events scheduled at the moment. Please check back later.</p>)}</div></section>
+      <section className="py-20 relative" id="events">
+        <div className="container mx-auto px-6">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 glow-text-secondary">Join Us at Upcoming Events</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">We actively participate in leading industry conferences and workshops. Connect with us and see our technology in action.</p>
+          </motion.div>
+          {loading && (<div className="space-y-6">
+            {
+              [...Array(2)].map((_, i) => (
+              <Card key={i} className="neural-card">
+                <CardContent className="p-6">
+                  <Skeleton className="h-24 w-full" />
+                </CardContent>
+              </Card>))
+            }
+        </div>
+      )}
+      {error && <p className="text-center text-red-500 text-lg">{error}</p>}
+      {!loading && !error && events.length > 0 && (
+        <div className="max-w-4xl mx-auto space-y-6">
+          {events.map((event, index) => (
+            <motion.div key={event._id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: index * 0.1 }}>
+              <Card className="neural-card">
+                <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-start">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-2">{event.title}</h3>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-x-6 gap-y-2 text-muted-foreground text-sm mb-4">
+                      <span className="flex items-center"><CalendarDays className="h-4 w-4 mr-2 text-primary" />
+                      {new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                      <span className="flex items-center"><MapPin className="h-4 w-4 mr-2 text-primary" />{event.location}</span>
+                      {event.boothNumber && <span className="flex items-center">
+                        <Building2 className="h-4 w-4 mr-2 text-primary" />Booth: {event.boothNumber}</span>}
+                    </div>
+                    <p className="text-muted-foreground leading-relaxed">{event.description}</p>
+                  </div>
+                  {/* {event.registrationUrl && (
+                    <div className="mt-4 md:mt-0 md:ml-6 flex-shrink-0">
+                      <Button asChild className="btn-neural"><a href={event.registrationUrl} target="_blank" rel="noopener noreferrer">Register Now</a></Button>
+                    </div>
+                  )} */}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>)}
+        {!loading && !error && events.length === 0 && (
+          <p className="text-center text-muted-foreground text-lg">There are no upcoming events scheduled at the moment. Please check back later.</p>
+        )}
+      </div>
+    </section>
     </div>
   );
 };

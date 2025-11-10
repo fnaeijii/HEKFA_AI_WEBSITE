@@ -15,7 +15,7 @@ const createPost = async (req, res) => {
 
     const post = new Post({
       title, slug, summary, content, category, tags, status, mainImageUrl,
-      authors, journal, publishedAt, citations, downloadUrl, // <<-- فیلدهای جدید اضافه شد
+      authors, journal, publishedAt, citations, downloadUrl,
       author: req.user._id,
     });
 
@@ -44,13 +44,11 @@ const updatePost = async (req, res) => {
       post.status = status || post.status;
       post.mainImageUrl = mainImageUrl || post.mainImageUrl;
       
-      // --- به‌روزرسانی فیلدهای جدید ---
-      post.authors = authors || post.authors;                   // <<-- اضافه شد
-      post.journal = journal || post.journal;                   // <<-- اضافه شد
-      post.publishedAt = publishedAt || post.publishedAt;       // <<-- اضافه شد
-      post.citations = citations !== undefined ? citations : post.citations; // <<-- اضافه شد
-      post.downloadUrl = downloadUrl || post.downloadUrl;       // <<-- اضافه شد
-      // -------------------------------
+      post.authors = authors || post.authors;                   
+      post.journal = journal || post.journal;                   
+      post.publishedAt = publishedAt || post.publishedAt;       
+      post.citations = citations !== undefined ? citations : post.citations;
+      post.downloadUrl = downloadUrl || post.downloadUrl;  
 
       const updatedPost = await post.save();
       res.json(updatedPost);
@@ -62,7 +60,6 @@ const updatePost = async (req, res) => {
   }
 };
 
-// ... (بقیه توابع: deletePost, getAllPublishedPosts, getPostBySlug بدون تغییر باقی می‌مانند)
 const deletePost = async (req, res) => {
   try {
     const post = await Post.findOne({ slug: req.params.slug });
@@ -79,9 +76,9 @@ const deletePost = async (req, res) => {
 
 const getAllPublishedPosts = async (req, res) => {
   try {
-    const posts = await Post.find({ status: 'published' }) // <<-- توجه: Published با P بزرگ
+    const posts = await Post.find({ status: 'published' })
       .populate('author', 'name')
-      .sort({ publishedAt: -1 }); // مرتب‌سازی بر اساس تاریخ انتشار
+      .sort({ publishedAt: -1 });
     res.json(posts);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error: error.message });

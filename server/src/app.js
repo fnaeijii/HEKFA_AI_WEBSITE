@@ -45,8 +45,8 @@ app.use('/api/posts', postRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/team', teamMemberRoutes);
 app.use('/api/case-studies', caseStudyRoutes);
-app.use('/api/upload', uploadRoutes); // <<-- این خط را اضافه کنید
-app.use('/api/events', eventRoutes); // <<-- 2. این خط را اضافه کنید
-app.use('/api/config', siteConfigRoutes); // <<-- 2. این خط را اضافه کنید
+app.use('/api/upload', uploadRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/config', siteConfigRoutes);
 
 module.exports = app;

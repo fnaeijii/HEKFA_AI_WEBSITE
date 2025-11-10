@@ -6,10 +6,7 @@ const ContactMessage = require('../models/ContactModel');
 // @access  Public
 const createContactMessage = async (req, res) => {
   try {
-    // داده‌ها را از بدنه درخواست (req.body) می‌خوانیم
     const { firstName, lastName, email, company, inquiryType, message } = req.body;
-
-    // یک سند جدید بر اساس مدل ایجاد می‌کنیم
     const newMessage = await ContactMessage.create({
       firstName,
       lastName,
@@ -19,14 +16,12 @@ const createContactMessage = async (req, res) => {
       message,
     });
 
-    // در صورت موفقیت، یک پیام موفقیت‌آمیز برمی‌گردانیم
     res.status(201).json({ 
         message: 'Your message has been received successfully!',
         data: newMessage 
     });
 
   } catch (error) {
-    // اگر ولیدیشن‌ها در مدل خطا بدهند، این بخش اجرا می‌شود
     if (error.name === 'ValidationError') {
       return res.status(400).json({ message: 'Validation Error', errors: error.errors });
     }
@@ -39,7 +34,6 @@ const createContactMessage = async (req, res) => {
 // @access  Private (Admin)
 const getAllContactMessages = async (req, res) => {
   try {
-    // پیام‌ها را از جدیدترین به قدیمی‌ترین مرتب می‌کنیم
     const messages = await ContactMessage.find({}).sort({ createdAt: -1 });
     res.json(messages);
   } catch (error) {
@@ -73,7 +67,7 @@ const toggleMessageReadStatus = async (req, res) => {
         const message = await ContactMessage.findById(req.params.id);
 
         if (message) {
-            message.isRead = !message.isRead; // وضعیت را برعکس می‌کند
+            message.isRead = !message.isRead;
             const updatedMessage = await message.save();
             res.json(updatedMessage);
         } else {
@@ -83,10 +77,6 @@ const toggleMessageReadStatus = async (req, res) => {
         res.status(500).json({ message: 'Server Error', error: error.message });
     }
 }
-
-// src/controllers/contactController.js
-
-// ... (توابع قبلی)
 
 // @desc    دریافت یک پیام تماس با ID
 // @route   GET /api/contact/:id
@@ -108,7 +98,7 @@ const getContactMessageById = async (req, res) => {
 module.exports = {
   createContactMessage,
   getAllContactMessages,
-  getContactMessageById, // <<-- تابع جدید را اینجا اضافه کن
+  getContactMessageById,
   deleteContactMessage,
   toggleMessageReadStatus,
 };

@@ -18,7 +18,6 @@ const createEvent = async (req, res) => {
 // @access  Public
 const getActiveEvents = async (req, res) => {
   try {
-    // رویدادها را بر اساس تاریخ (از نزدیک‌ترین به دورترین) مرتب می‌کنیم
     const events = await Event.find({ isActive: true }).sort({ date: 1 });
     res.json(events);
   } catch (error) {

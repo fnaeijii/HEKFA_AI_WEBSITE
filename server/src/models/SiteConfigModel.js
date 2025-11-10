@@ -1,20 +1,16 @@
 const mongoose = require('mongoose');
 
-// Schema برای هر آیتم آمار تحقیقاتی
 const researchStatSchema = new mongoose.Schema({
   label: { type: String, required: true },
   value: { type: String, required: true },
   icon: { type: String, required: true },
 });
 
-// <<-- ۱. این Schema جدید را اضافه کنید -->>
-// Schema برای هر آیتم آمار شرکت (صفحه درباره ما)
 const companyStatSchema = new mongoose.Schema({
-    value: { type: String, required: true }, // e.g., "500+"
-    label: { type: String, required: true }, // e.g., "AI Projects Completed"
+    value: { type: String, required: true },
+    label: { type: String, required: true },
 });
 
-// Schema برای هر آیتم اطلاعات تماس
 const contactInfoSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
@@ -22,7 +18,6 @@ const contactInfoSchema = new mongoose.Schema({
   icon: { type: String, required: true },
 });
 
-// Schema برای هر دفتر
 const officeSchema = new mongoose.Schema({
   city: { type: String, required: true },
   country: { type: String, required: true },
@@ -31,7 +26,6 @@ const officeSchema = new mongoose.Schema({
   type: { type: String, enum: ['Headquarters', 'European Office', 'Asia Pacific Office', 'Branch'] },
 });
 
-// Schema اصلی تنظیمات سایت
 const siteConfigSchema = new mongoose.Schema(
   {
     configName: {
@@ -40,7 +34,7 @@ const siteConfigSchema = new mongoose.Schema(
       unique: true,
     },
     researchStats: [researchStatSchema],
-    companyStats: [companyStatSchema], // <<-- ۲. این فیلد جدید را اینجا اضافه کنید
+    companyStats: [companyStatSchema],
     contactInfo: [contactInfoSchema],
     globalOffices: [officeSchema],
   },

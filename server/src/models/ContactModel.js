@@ -18,7 +18,6 @@ const contactSchema = new mongoose.Schema(
       required: [true, 'Email is required'],
       trim: true,
       lowercase: true,
-      // یک ولیدیشن ساده برای فرمت ایمیل
       match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address.'],
     },
     company: {
@@ -33,13 +32,13 @@ const contactSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Message is required'],
     },
-    isRead: { // این فیلد در فاز دوم برای پنل ادمین مفید خواهد بود
+    isRead: {
       type: Boolean,
       default: false,
     },
   },
   {
-    timestamps: true, // زمان دریافت پیام را ثبت می‌کند
+    timestamps: true,
   }
 );
 

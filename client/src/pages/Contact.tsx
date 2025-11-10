@@ -63,7 +63,7 @@ const Contact = () => {
         setLoading(true);
         const response = await api.get('/config');
         setContactInfo(response.data.contactInfo);
-        setOffices(response.data.globalOffices); // نام فیلد در بک‌اند globalOffices است
+        setOffices(response.data.globalOffices);
         setError(null);
       } catch (err) {
         setError('Failed to load contact information.');
@@ -73,22 +73,19 @@ const Contact = () => {
       }
     };
     fetchConfig();
-  }, []); // فقط یک بار هنگام بارگذاری 
+  }, []);
 
-  // تابع برای مدیریت تغییرات در فیلدهای Input و Textarea
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
   
-  // تابع برای مدیریت تغییرات در کامپوننت Select
   const handleSelectChange = (value: string) => {
     setFormData((prev) => ({ ...prev, inquiryType: value }));
   };
 
-  // تابع اصلی برای ارسال فرم به API بک‌اند
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // جلوگیری از رفرش شدن صفحه
+    e.preventDefault();
     setIsSubmitting(true);
 
     try {
@@ -97,7 +94,6 @@ const Contact = () => {
         toast.success("Message sent successfully!", {
           description: "Our team will get back to you shortly.",
         });
-        // پاک کردن فرم پس از ارسال موفق
         setFormData({
           firstName: '', lastName: '', email: '', company: '', inquiryType: '', message: '',
         });
@@ -112,14 +108,6 @@ const Contact = () => {
     }
   };
 
-  // // تمام داده‌های استاتیک و بخش‌های دیگر کاملاً دست‌نخورده باقی مانده‌اند
-  // const contactInfo = [
-  //   { title: "Email Us", description: "Get in touch via email", value: "contact@hekfa.ai", icon: Mail, link: "mailto:contact@hekfa.ai" },
-  //   { title: "Call Us", description: "Speak with our team", value: "+1 (555) 123-4567", icon: Phone, link: "tel:+15551234567" },
-  //   { title: "Visit Us", description: "Our headquarters", value: "San Francisco, CA", icon: MapPin, link: "#" },
-  //   { title: "Business Hours", description: "Monday - Friday", value: "9:00 AM - 6:00 PM PST", icon: Clock, link: "#" },
-  // ];
-
   const inquiryTypes = [
     { title: "General Inquiry", description: "Questions about our AI solutions and services", icon: MessageSquare, color: "primary" },
     { title: "Partnership", description: "Collaboration and business partnership opportunities", icon: Handshake, color: "secondary" },
@@ -127,12 +115,7 @@ const Contact = () => {
     { title: "Careers", description: "Join our team of AI innovators", icon: Users, color: "primary" },
   ];
 
-  // const offices = [
-  //   { city: "San Francisco", country: "United States", address: "123 Innovation Drive, San Francisco, CA 94105", phone: "+1 (555) 123-4567", type: "Headquarters" },
-  //   { city: "London", country: "United Kingdom", address: "45 Tech Square, London EC2A 3LT", phone: "+44 20 7123 4567", type: "European Office" },
-  //   { city: "Singapore", country: "Singapore", address: "78 AI Hub, Singapore 018956", phone: "+65 6123 4567", type: "Asia Pacific Office" },
-  // ];
-
+  
   return (
     <div className="min-h-screen pt-20">
       {/* Hero Section */}
@@ -158,7 +141,7 @@ const Contact = () => {
               ))
             ) : (
               contactInfo.map((info, index) => {
-                const IconComponent = iconMap[info.icon]; // پیدا کردن کامپوننت آیکون
+                const IconComponent = iconMap[info.icon];
                 return (
                   <motion.div key={info.title} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: index * 0.1 }}>
                     <Card className="neural-card text-center h-full">

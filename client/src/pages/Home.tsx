@@ -13,13 +13,10 @@ import FloatingParticles from "@/components/effects/FloatingParticles";
 import { LottieIcon } from "@/components/ui/LottieIcon";
 import FeaturedSlider from "@/components/slider/FeaturedSlider";
 
-// وارد کردن ابزارهای لازم برای اتصال به بک‌اند
 import { useQuery } from "@tanstack/react-query";
-// import axios from "axios";
 import api from '@/lib/axiosConfig';
 import { Skeleton } from "@/components/ui/skeleton";
 
-// وارد کردن انیمیشن‌ها (مانند قبل)
 import eyeBlinkingAnimation from "@/assets/animations/eye-blinking.json";
 import brainAnimation from "@/assets/animations/Brain.json";
 import networkAnimation from "@/assets/animations/Network.json";
@@ -32,28 +29,23 @@ import SecurityAnimation from "@/assets/animations/Security.json";
 import lightingAnimation from "@/assets/animations/lighting.json";
 import globeAnimation from "@/assets/animations/Globe.json";
 
-// تعریف Interface برای نوع داده پروژه
 interface Project {
   _id: string;
   slug: string;
   title: string;
   summary: string;
   category: string;
-  image?: string; // تصویر را اختیاری در نظر می‌گیریم
+  image?: string;
 }
 
-// تابع برای دریافت پروژه‌های ویژه از API
 const fetchFeaturedProjects = async (): Promise<Project[]> => {
   const { data } = await api.get('/projects');
-  // پروژه‌هایی که isFeatured هستند را فیلتر کرده و فقط ۴ تای اول را برمی‌گردانیم
   return data.filter((p: any) => p.isFeatured).slice(0, 4);
 };
 
 
 const Home = () => {
   const { t } = useTranslation();
-  
-  // استفاده از useQuery برای دریافت و مدیریت داده‌های پروژه‌های ویژه
   const { 
     data: featuredProjects, 
     isLoading: isLoadingProjects, 
@@ -63,9 +55,7 @@ const Home = () => {
     queryFn: fetchFeaturedProjects,
   });
 
-  // تبدیل داده‌های دریافت شده به فرمت مورد نیاز اسلایدر
   const featuredSlides = featuredProjects?.map((project, index) => ({
-    // <<-- FIX IS HERE: Use the array index as a numeric ID
     id: index + 1,
     image: project.image || `https://picsum.photos/1200/600?random=${project._id}`,
     title: project.title,
@@ -88,7 +78,6 @@ const Home = () => {
     viewport: { once: true }
   };
 
-  // About cards data
   const aboutCards = [
     {
       animationData:IdeaBulbAnimation,
@@ -167,7 +156,6 @@ const Home = () => {
       {/* AI Chatbot with enhanced floating button */}
       {/* <AIChatbot /> */}
       
-      {/* Hero Section - (بدون تغییر) */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* <ThreeNeuralBackground /> */}
         <FloatingParticles count={80} />
@@ -287,7 +275,6 @@ const Home = () => {
         />
       )}
 
-      {/* About Section - (بدون تغییر) */}
       <section className="py-32 relative">
         <div className="container mx-auto px-6">
           <motion.div

@@ -10,11 +10,11 @@ const {
 const { protect } = require('../middleware/authMiddleware');
 
 router.route('/')
-  .post(protect, createTeamMember) // ادمین ایجاد می‌کند
-  .get(getAllTeamMembers);         // همه می‌بینند
+  .post(protect, createTeamMember) 
+  .get(getAllTeamMembers);         
 
 router.route('/:id')
-  .put(protect, updateTeamMember)   // ادمین ویرایش می‌کند
-  .delete(protect, deleteTeamMember); // ادمین حذف می‌کند
+  .put(protect, updateTeamMember)  
+  .delete(protect, deleteTeamMember);
 
 module.exports = router;

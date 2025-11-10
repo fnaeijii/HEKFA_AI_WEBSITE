@@ -25,11 +25,11 @@ const teamMemberSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Image URL is required'],
     },
-    linkedinUrl: { // فیلد جدید برای لینکدین
+    linkedinUrl: {
       type: String,
       trim: true,
     },
-    order: { // برای مرتب‌سازی اعضای تیم در صفحه
+    order: {
       type: Number,
       default: 0,
     },

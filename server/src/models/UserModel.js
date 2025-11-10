@@ -16,19 +16,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // +++ اضافه شد +++
   isAdmin: {
     type: Boolean,
     required: true,
-    default: false, // نکته امنیتی مهم: به طور پیش‌فرض هیچ کاربری ادمین نیست
+    default: false,
   },
 }, {
-  timestamps: true // اضافه کردن این گزینه برای ثبت زمان ساخت و آپدیت خوب است
+  timestamps: true
 });
 
-// Hash کردن پسورد قبل از ذخیره در دیتابیس
 userSchema.pre('save', async function (next) {
-  // فقط در صورتی که پسورد تغییر کرده باشد آن را هش کن
   if (!this.isModified('password')) {
     return next();
   }
@@ -38,7 +35,6 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// متدی برای مقایسه پسورد وارد شده با پسورد هش شده در دیتابیس
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

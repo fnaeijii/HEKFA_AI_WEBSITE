@@ -10,7 +10,8 @@ const getProjects = async (req, res) => {
     if (req.query.featured === 'true') {
       filter.isFeatured = true;
     }
-    const projects = await Project.find(filter).sort({ order: 1 });
+    // مرتب‌سازی پروژه‌ها بر اساس فیلد isFeatured (پروژه‌های ویژه اول) و سپس زمان ساخت
+    const projects = await Project.find(filter).sort({ isFeatured: -1, createdAt: -1 });
     res.json(projects);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error: error.message });
@@ -18,8 +19,9 @@ const getProjects = async (req, res) => {
 };
 
 // @desc    دریافت یک پروژه با slug
-// @route   GET /api/projects/:slug
+// @route   GET /api/projects/slug/:slug  <-- مسیر پیشنهادی برای جلوگیری از تداخل
 // @access  Public
+// نکته: من مسیر را به /slug/:slug تغییر دادم تا با ID تداخل نداشته باشد. شما باید این را در projectRoutes.js هم اعمال کنید.
 const getProjectBySlug = async (req, res) => {
   try {
     const project = await Project.findOne({ slug: req.params.slug });
@@ -38,7 +40,11 @@ const getProjectBySlug = async (req, res) => {
 // @access  Private (Admin)
 const createProject = async (req, res) => {
   try {
-    const { title, slug, summary, description, category, technologies, status, metrics, projectUrl, order, mainImageUrl, galleryImageUrls } = req.body;
+    // --- فیلدها با مدل جدید هماهنگ شدند ---
+    const { 
+      title, slug, category, description, overview, status, isFeatured,
+      technologies, keyFeatures, mainImageUrl, demoUrl, videoUrl 
+    } = req.body;
     
     const projectExists = await Project.findOne({ slug });
     if (projectExists) {
@@ -46,7 +52,8 @@ const createProject = async (req, res) => {
     }
 
     const project = await Project.create({
-      title, slug, summary, description, category, technologies, status, metrics, projectUrl, order, mainImageUrl, galleryImageUrls
+      title, slug, category, description, overview, status, isFeatured,
+      technologies, keyFeatures, mainImageUrl, demoUrl, videoUrl
     });
     res.status(201).json(project);
   } catch (error) {
@@ -55,28 +62,33 @@ const createProject = async (req, res) => {
 };
 
 // @desc    ویرایش یک پروژه
-// @route   PUT /api/projects/:slug
+// @route   PUT /api/projects/slug/:slug
 // @access  Private (Admin)
 const updateProject = async (req, res) => {
   try {
-    const { title, slug, summary, description, category, technologies, status, isFeatured, metrics, projectUrl, order, mainImageUrl, galleryImageUrls } = req.body;
-
     const project = await Project.findOne({ slug: req.params.slug });
 
     if (project) {
-      project.title = title || project.title;
-      project.slug = slug || project.slug;
-      project.summary = summary || project.summary;
-      project.description = description || project.description;
-      project.category = category || project.category;             // <<-- اضافه شد
-      project.technologies = technologies || project.technologies;
-      project.status = status || project.status;
-      project.metrics = metrics || project.metrics;                 // <<-- اضافه شد
-      project.projectUrl = projectUrl || project.projectUrl;
-      project.order = order !== undefined ? order : project.order;
-      project.mainImageUrl = mainImageUrl || project.mainImageUrl;
-      project.galleryImageUrls = galleryImageUrls || project.galleryImageUrls;
+      // --- فیلدهای ارسالی از req.body را استخراج می‌کنیم ---
+      const { 
+        title, slug, category, description, overview, status, isFeatured,
+        technologies, keyFeatures, mainImageUrl, demoUrl, videoUrl 
+      } = req.body;
+
+      // --- به‌روزرسانی هوشمند: فقط فیلدهایی که در درخواست وجود دارند آپدیت می‌شوند ---
+      if (title) project.title = title;
+      if (slug) project.slug = slug;
+      if (category) project.category = category;
+      if (description) project.description = description;
+      if (overview) project.overview = overview;
+      if (status) project.status = status;
+      if (technologies) project.technologies = technologies; // آرایه کامل جایگزین می‌شود
+      if (keyFeatures) project.keyFeatures = keyFeatures; // آرایه کامل جایگزین می‌شود
+      if (mainImageUrl) project.mainImageUrl = mainImageUrl;
+      if (demoUrl) project.demoUrl = demoUrl;
+      if (videoUrl) project.videoUrl = videoUrl;
       
+      // برای فیلد boolean باید به صورت جداگانه بررسی شود
       if (typeof isFeatured === 'boolean') {
         project.isFeatured = isFeatured;
       }
@@ -93,7 +105,7 @@ const updateProject = async (req, res) => {
 
 
 // @desc    حذف یک پروژه
-// @route   DELETE /api/projects/:slug
+// @route   DELETE /api/projects/slug/:slug
 // @access  Private (Admin)
 const deleteProject = async (req, res) => {
     try {

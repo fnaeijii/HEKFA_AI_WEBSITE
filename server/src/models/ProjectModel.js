@@ -2,60 +2,94 @@
 const mongoose = require('mongoose');
 
 const CATEGORIES = [
-  'NLP', 
-  'Computer Vision', 
-  'Data Analysis', 
-  'Robotics', 
+  'NLP',
+  'Computer Vision',
+  'Speech',
+  'IoT',
   'Other'
 ];
+
+// --- زیر-اسکیما برای تکنولوژی‌ها ---
+const technologySchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  icon: { type: String, required: true } // می‌تواند ایموجی یا نام آیکون Lucide باشد
+}, { _id: false }); // _id برای هر تکنولوژی لازم نیست
+
+// --- زیر-اسکیما برای ویژگی‌های کلیدی ---
+const keyFeatureSchema = new mongoose.Schema({
+  icon: { type: String, required: true }, // نام آیکون Lucide
+  title: { type: String, required: true },
+  description: { type: String, required: true }
+}, { _id: false }); // _id برای هر ویژگی کلیدی لازم نیست
 
 const projectSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true, // این فیلد اجباری است
-      trim: true, // فاصله‌های اضافی ابتدا و انتها را حذف می‌کند
+      required: true,
+      trim: true,
     },
     slug: {
       type: String,
       required: true,
-      unique: true, // هر پروژه باید یک اسلاگ منحصر به فرد داشته باشد
+      unique: true,
     },
     category: {
       type: String,
       required: true,
-      enum: CATEGORIES, // <<-- استفاده از enu
+      enum: CATEGORIES,
       default: 'Other',
-      },
+    },
+    // توضیحات کوتاه برای بخش Hero
     description: {
+      type: String,
+      required: true,
+    },
+    // --- فیلد جدید: توضیحات کامل برای بخش "Project Overview" ---
+    overview: {
       type: String,
       required: true,
     },
     status: {
       type: String,
-      enum: ['Production', 'Beta', 'Research', 'Completed'], // فقط این مقادیر مجاز هستند
+      enum: ['Production', 'Beta', 'Research', 'Completed'],
       default: 'Production',
     },
-    
-    isFeatured: { // <<-- این فیلد را اضافه کن
+    isFeatured: {
       type: Boolean,
       default: false,
     },
-    metrics: { type: mongoose.Schema.Types.Mixed }, // <<-- این خط را اضافه کن (برای انعطاف‌پذیری)
+    
+    // --- ساختار این فیلد تغییر کرد ---
     technologies: {
-      type: [String], // آرایه‌ای از رشته‌ها
+      type: [technologySchema],
       default: [],
     },
-    icon: {
-      type: String, // نام آیکون از lucide-react
+
+    // --- فیلد جدید: برای بخش "Key Features & Results" ---
+    keyFeatures: {
+      type: [keyFeatureSchema],
+      default: [],
     },
+
     mainImageUrl: {
-      type: String,
+      type: String, // برای بخش "System in Action"
     },
-    // فیلدهای دیگر را می‌توان در آینده اضافه کرد
+
+    // --- فیلدهای جدید اختیاری ---
+    demoUrl: {
+      type: String, // لینک دموی زنده
+    },
+    videoUrl: {
+      type: String, // لینک ویدیوی دمو
+    },
+
+    // این فیلدها حفظ شدند اما شاید دیگر لازم نباشند
+    metrics: { type: mongoose.Schema.Types.Mixed },
+    icon: { type: String },
   },
   {
-    timestamps: true, // به صورت خودکار فیلدهای createdAt و updatedAt را اضافه می‌کند
+    timestamps: true,
   }
 );
 

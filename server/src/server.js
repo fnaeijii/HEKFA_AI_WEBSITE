@@ -1,5 +1,5 @@
 // src/server.js (Updated)
-require('dotenv').config(); // این خط را اضافه کنید
+require('dotenv').config();
 
 const http = require('http');
 const app = require('./app');

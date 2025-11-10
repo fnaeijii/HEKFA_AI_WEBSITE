@@ -148,28 +148,6 @@ const FeaturedSlider: React.FC<FeaturedSliderProps> = ({
               Featured Content
             </span>
           </motion.div>
-          
-          {/* <motion.h2 
-            className="text-4xl md:text-6xl font-bold mt-6 mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-              Discover Our Latest
-            </span>
-          </motion.h2>
-          
-          <motion.p 
-            className="text-xl text-muted-foreground max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            Explore cutting-edge AI innovations and breakthrough technologies that are shaping the future.
-          </motion.p> */}
         </motion.div>
 
         {/* Slider Container */}

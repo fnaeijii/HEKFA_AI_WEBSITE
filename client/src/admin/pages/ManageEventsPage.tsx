@@ -90,8 +90,6 @@ const ManageEventsPage = () => {
   // --- Handlers ---
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // <<--- کد دیباگ را اینجا اضافه کنید ---
     console.log("Submitting with values:", {
         title,
         date,

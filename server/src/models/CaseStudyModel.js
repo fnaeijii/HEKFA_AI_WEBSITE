@@ -8,25 +8,25 @@ const caseStudySchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    slug: { // برای دسترسی راحت‌تر از طریق URL
+    slug: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
     },
-    client: { // نام مشتری
+    client: {
       type: String,
       required: true,
       trim: true,
     },
-    description: { // شرح پروژه و چالش
+    description: {
       type: String,
       required: true,
     },
-    technologies: [{ // تکنولوژی‌های استفاده شده
+    technologies: [{
       type: String,
     }],
-    results: [{ // نتایج کلیدی به صورت لیستی از رشته‌ها
+    results: [{
       type: String,
     }],
     imageUrl: {
