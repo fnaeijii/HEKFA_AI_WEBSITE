@@ -17,6 +17,7 @@ import Research from "./pages/Research";
 import Contact from "./pages/Contact";
 import ProjectDetailPage from './pages/ProjectDetailPage'; // این صفحه جزئیات پروژه است
 import NotFound from "./pages/NotFound";
+import CaseStudyTemplatePage from "./pages/CaseStudyTemplate";
 
 // --- Admin Imports ---
 import LoginPage from './admin/pages/LoginPage';
@@ -46,6 +47,7 @@ const App = () => (
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="projects" element={<Projects />} />
+            <Route path="case-study-template" element={<CaseStudyTemplatePage />} />
             
             {/* ▼▼▼ تنها خطی که اضافه شده اینجاست ▼▼▼ */}
             {/* این مسیر داینامیک برای نمایش صفحه جزئیات هر پروژه است */}
