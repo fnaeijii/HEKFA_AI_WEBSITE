@@ -20,4 +20,10 @@ router.route('/slug/:slug')
   .put(protect, updateProject)
   .delete(protect, deleteProject);
 
+// Backward-compatible slug routes for admin endpoints
+router.route('/:slug')
+  .get(getProjectBySlug)
+  .put(protect, updateProject)
+  .delete(protect, deleteProject);
+
 module.exports = router;

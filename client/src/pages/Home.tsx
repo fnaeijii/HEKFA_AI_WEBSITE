@@ -16,6 +16,7 @@ import FeaturedSlider from "@/components/slider/FeaturedSlider";
 import { useQuery } from "@tanstack/react-query";
 import api from '@/lib/axiosConfig';
 import { Skeleton } from "@/components/ui/skeleton";
+import { selectLocalized } from "@/lib/utils";
 
 import eyeBlinkingAnimation from "@/assets/animations/eye-blinking.json";
 import brainAnimation from "@/assets/animations/Brain.json";
@@ -33,19 +34,29 @@ interface Project {
   _id: string;
   slug: string;
   title: string;
+  titleFa?: string;
   summary: string;
+  summaryFa?: string;
   category: string;
-  image?: string;
+  mainImageUrl?: string;
+  randomSlideshowImage?: string | null;
 }
 
 const fetchFeaturedProjects = async (): Promise<Project[]> => {
-  const { data } = await api.get('/projects');
-  return data.filter((p: any) => p.isFeatured).slice(0, 4);
+  const { data } = await api.get('/projects', {
+    params: { featured: true },
+  });
+  return data.slice(0, 4);
 };
 
 
 const Home = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const resolveImageUrl = (imagePath?: string | null) => {
+    if (!imagePath) return null;
+    return imagePath.startsWith('http') ? imagePath : `${apiBaseUrl}${imagePath}`;
+  };
   const { 
     data: featuredProjects, 
     isLoading: isLoadingProjects, 
@@ -55,15 +66,18 @@ const Home = () => {
     queryFn: fetchFeaturedProjects,
   });
 
-  const featuredSlides = featuredProjects?.map((project, index) => ({
-    id: index + 1,
-    image: project.image || `https://picsum.photos/1200/600?random=${project._id}`,
-    title: project.title,
-    description: project.summary,
-    category: project.category,
-    buttonText: "View Project Details",
-    buttonLink: `/projects/${project.slug}`
-  }));
+  const featuredSlides = featuredProjects?.map((project, index) => {
+    const resolvedImage = resolveImageUrl(project.randomSlideshowImage || project.mainImageUrl);
+    return {
+      id: index + 1,
+      image: resolvedImage || `https://picsum.photos/1200/600?random=${project._id}`,
+      title: selectLocalized(project, "title", i18n.language) ?? project.title,
+      description: selectLocalized(project, "summary", i18n.language) ?? project.summary,
+      category: project.category,
+      buttonText: t("hero.exploreBtn"),
+      buttonLink: `/projects/${project.slug}`
+    };
+  });
 
   const fadeInUp = {
     initial: { opacity: 0, y: 60 },
@@ -101,66 +115,29 @@ const Home = () => {
     }
   ];
 
-  // Products/Solutions data
-  const solutions = [
-    {
-      animationData: eyeBlinkingAnimation,
-      title: "Computer Vision",
-      description: "Advanced image recognition and video analytics for security, automation, and quality control.",
-      gradient: "from-blue-500 to-cyan-500"
+  // Fetch intelligence/solutions data dynamically
+  const { 
+    data: solutions, 
+    isLoading: isLoadingSolutions, 
+    isError: isErrorSolutions 
+  } = useQuery({
+    queryKey: ['intelligenceItems'],
+    queryFn: async () => {
+      const { data } = await api.get('/intelligence?featured=true');
+      return data;
     },
-    {
-      animationData: networkAnimation,
-      title: "Neural Networks",
-      description: "Deep learning models that adapt and evolve to solve your most complex business problems.",
-      gradient: "from-violet-500 to-purple-500"
-    },
-    {
-      animationData: faceAnimation,
-      title: "Machine Learning",
-      description: "Predictive analytics and intelligent automation that optimize operations and drive growth.",
-      gradient: "from-teal-500 to-emerald-500"
-    },
-    {
-      animationData: chatAnimation,
-      title: "Natural Language AI",
-      description: "Conversational AI and language understanding that enhances customer experiences.",
-      gradient: "from-pink-500 to-rose-500"
-    }
-  ];
-
-  // Testimonials data
-  const testimonials = [
-    {
-      quote: "Hekfa's AI solutions transformed our operations, increasing efficiency by 300% within the first quarter.",
-      author: "Sarah Chen",
-      role: "CTO, TechCorp International",
-      image: "/api/placeholder/80/80"
-    },
-    {
-      quote: "The computer vision system deployed by Hekfa has revolutionized our quality control process completely.",
-      author: "Michael Rodriguez",
-      role: "VP Operations, Manufacturing Inc",
-      image: "/api/placeholder/80/80"
-    },
-    {
-      quote: "Working with Hekfa has been transformative. Their expertise in AI is unmatched in the industry.",
-      author: "Emma Thompson",
-      role: "Director of Innovation, FinanceHub",
-      image: "/api/placeholder/80/80"
-    }
-  ];
+  });
 
   return (
-    <div className="min-h-screen overflow-hidden bg-transparent">
+    <div className="min-h-screen overflow-x-hidden bg-transparent">
       {/* AI Chatbot with enhanced floating button */}
       {/* <AIChatbot /> */}
       
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-visible">
         {/* <ThreeNeuralBackground /> */}
         <FloatingParticles count={80} />
         <motion.div
-          className="absolute top-1/3 right-1/2 transform -translate-x-1/2 -translate-y-1/2 z-5"
+          className="absolute top-1/3 right-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 0.8, scale: 1 }}
           transition={{ duration: 1.2, delay: 0.8, ease: "easeOut" }}
@@ -187,7 +164,7 @@ const Home = () => {
                 className="mb-8 border-primary/30 bg-primary/5 px-6 py-3 backdrop-blur-sm text-sm text-glow-reveal"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
-                Next-Generation Artificial Intelligence
+                {t("hero.badge")}
               </Badge>
             </motion.div>
             
@@ -198,7 +175,7 @@ const Home = () => {
               transition={{ duration: 1, delay: 0.5 }}
             >
               <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent text-glow-reveal">
-              Transforming Ideas
+                {t("hero.title")}
               </span>
               <br />
               <motion.span 
@@ -207,7 +184,8 @@ const Home = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.8 }}
               >
-                Into Intelligence
+                {/* Second line already part of hero.title in translations, keep visual split */}
+                {""}
               </motion.span>
             </motion.h1>
             
@@ -217,7 +195,7 @@ const Home = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 1 }}
             >
-              Hekfa pioneers cutting-edge solutions in AI, LLMs, IOTs, Computer Vision, and Voice Processing. We turn tomorrow's possibilities into today's reality.
+              {t("hero.subtitle")}
             </motion.p>
             
             <motion.div
@@ -228,7 +206,7 @@ const Home = () => {
             >
               <Button asChild className="btn-glow text-lg h-14 px-12">
                 <Link to="/projects">
-                  Explore Our AI Solutions
+                  {t("hero.exploreBtn")}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -282,16 +260,15 @@ const Home = () => {
             className="text-center mb-20"
           >
             <Badge variant="outline" className="mb-4 border-secondary/30 text-secondary">
-              Our Foundation
+              {t("home.foundation.badge")}
             </Badge>
             <h2 className="text-4xl md:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
-                Built on Innovation
+                {t("home.foundation.title")}
               </span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              At Hekfa, we believe artificial intelligence should amplify human potential, 
-              not replace it. Our mission is to create AI that inspires trust and drives meaningful change.
+              {t("home.foundation.subtitle")}
             </p>
           </motion.div>
 
@@ -310,10 +287,10 @@ const Home = () => {
                       />
                     </div>
                     <h3 className="text-xl font-bold mb-4 group-hover:text-primary transition-colors">
-                      {card.title}
+                      {t(`home.foundation.card${index + 1}Title` as const)}
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      {card.description}
+                      {t(`home.foundation.card${index + 1}Description` as const)}
                     </p>
                   </CardContent>
                 </Card>
@@ -333,51 +310,100 @@ const Home = () => {
             className="text-center mb-20"
           >
             <Badge variant="outline" className="mb-4 border-accent/30 text-accent">
-              AI Solutions
+              {t("home.solutions.badge")}
             </Badge>
             <h2 className="text-4xl md:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-                Powered by Intelligence
+                {t("home.solutions.title")}
               </span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive AI products designed to transform every aspect of your business operations.
+              {t("home.solutions.subtitle")}
             </p>
           </motion.div>
 
-          <motion.div 
-            {...staggerContainer}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
-          >
-            {solutions.map((solution, index) => (
-              <motion.div key={solution.title} {...fadeInUp}>
-                <Card className="neural-card h-full group cursor-pointer overflow-hidden">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${solution.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
-                  <CardContent className="p-10 relative z-10">
-                    <div className="flex items-start gap-6">
-                      <div className="p-4 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                        <LottieIcon 
-                          animationData={solution.animationData}
-                          size={80}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-2xl font-bold mb-4 group-hover:text-primary transition-colors">
-                          {solution.title}
-                        </h3>
-                        <p className="text-muted-foreground text-lg leading-relaxed mb-4">
-                          {solution.description}
-                        </p>
-                        <div className="flex items-center text-primary font-semibold group-hover:translate-x-2 transition-transform">
-                          Learn more <ChevronRight className="h-5 w-5 ml-1" />
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
+          {isLoadingSolutions && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-64 w-full rounded-xl" />
+              ))}
+            </div>
+          )}
+
+          {isErrorSolutions && (
+            <div className="text-center text-red-500">
+              Failed to load intelligence items. Please try again later.
+            </div>
+          )}
+
+          {solutions && solutions.length > 0 && (
+            <motion.div 
+              {...staggerContainer}
+              className="grid grid-cols-1 md:grid-cols-2 gap-8"
+            >
+              {solutions.map((solution: any, index: number) => {
+                // Map animation data strings to actual animation objects
+                const animationMap: { [key: string]: any } = {
+                  'eye-blinking': eyeBlinkingAnimation,
+                  'network': networkAnimation,
+                  'face-recognition': faceAnimation,
+                  'chatbot-typing': chatAnimation,
+                };
+                const animationData = solution.animationData 
+                  ? animationMap[solution.animationData] || eyeBlinkingAnimation
+                  : eyeBlinkingAnimation;
+
+                const localizedTitle =
+                  selectLocalized(solution as any, "title", i18n.language) ??
+                  solution.title;
+                const localizedDescription =
+                  selectLocalized(
+                    solution as any,
+                    "heroDescription",
+                    i18n.language
+                  ) ??
+                  selectLocalized(
+                    solution as any,
+                    "description",
+                    i18n.language
+                  ) ??
+                  solution.heroDescription ??
+                  solution.description;
+
+                return (
+                  <motion.div key={solution._id || solution.title} {...fadeInUp}>
+                    <Card className="neural-card h-full group cursor-pointer overflow-hidden">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${solution.gradient || 'from-blue-500 to-cyan-500'} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+                      <CardContent className="p-10 relative z-10">
+                        <Link to={`/intelligence/${solution.slug}`} className="block">
+                          <div className="flex items-start gap-6">
+                            <div className="p-4 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                              <LottieIcon 
+                                animationData={animationData}
+                                size={80}
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-2xl font-bold mb-4 group-hover:text-primary transition-colors">
+                                {localizedTitle}
+                              </h3>
+                              <p className="text-muted-foreground text-lg leading-relaxed mb-4">
+                                {localizedDescription}
+                              </p>
+                              <div className="flex items-center text-primary font-semibold group-hover:translate-x-2 transition-transform">
+                                {t("home.solutions.learnMore")}
+                                <ChevronRight className="h-5 w-5 ml-1" />
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
         </div>
       </section>
 
@@ -393,24 +419,23 @@ const Home = () => {
           >
             <h2 className="text-4xl md:text-6xl font-bold mb-8">
               <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-                Ready to Experience the Future?
+                {t("home.finalCta.title")}
               </span>
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto">
-              Join hundreds of forward-thinking organizations already transforming their 
-              operations with Hekfa's AI solutions.
+              {t("home.finalCta.subtitle")}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Button asChild className="btn-glow text-lg h-14 px-12">
                 <Link to="/contact">
-                  Start Your AI Journey
+                  {t("home.finalCta.primary")}
                   <Sparkles className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-primary/30 hover:bg-primary/10 text-lg h-14 px-12">
                 <Link to="/projects">
-                  View Case Studies
+                  {t("home.finalCta.secondary")}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -419,15 +444,15 @@ const Home = () => {
             <div className="mt-16 flex items-center justify-center gap-12 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-primary" />
-                <span>500+ Clients Worldwide</span>
+                <span>{t("home.finalCta.stat1")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-secondary" />
-                <span>99.9% Uptime SLA</span>
+                <span>{t("home.finalCta.stat2")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Heart className="h-5 w-5 text-accent" />
-                <span>24/7 Expert Support</span>
+                <span>{t("home.finalCta.stat3")}</span>
               </div>
             </div>
           </motion.div>

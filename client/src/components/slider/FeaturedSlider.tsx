@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // TypeScript interface for slide objects
 interface FeaturedSlide {
@@ -107,7 +108,6 @@ const FeaturedSlider: React.FC<FeaturedSliderProps> = ({
       transition: {
         duration: 0.6,
         delay: 0.2,
-        ease: "easeOut"
       }
     }
   };
@@ -121,7 +121,6 @@ const FeaturedSlider: React.FC<FeaturedSliderProps> = ({
       transition: {
         duration: 0.5,
         delay: 0.4,
-        ease: "easeOut"
       }
     }
   };
@@ -218,20 +217,21 @@ const FeaturedSlider: React.FC<FeaturedSliderProps> = ({
                       </motion.p>
 
                       {/* CTA Button */}
-                      {slides[currentSlide].buttonText && (
+                      {slides[currentSlide].buttonText && slides[currentSlide].buttonLink && (
                         <motion.div
                           variants={buttonVariants}
                           initial="hidden"
                           animate="visible"
                         >
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="inline-flex items-center px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-300 shadow-xl"
-                          >
-                            {slides[currentSlide].buttonText}
-                            <ChevronRight className="ml-2 h-4 w-4" />
-                          </motion.button>
+                          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                            <Link
+                              to={slides[currentSlide].buttonLink}
+                              className="inline-flex items-center px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-300 shadow-xl"
+                            >
+                              {slides[currentSlide].buttonText}
+                              <ChevronRight className="ml-2 h-4 w-4" />
+                            </Link>
+                          </motion.div>
                         </motion.div>
                       )}
                     </div>

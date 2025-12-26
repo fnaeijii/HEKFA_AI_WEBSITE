@@ -6,13 +6,15 @@ const {
   createPost,
   updatePost,
   deletePost,
-  getAllPublishedPosts,
+  getPosts,
+  getPostsGroupedByCategory,
   getPostBySlug,
 } = require('../controllers/postController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, optionalAuth } = require('../middleware/authMiddleware');
 
-router.route('/').get(getAllPublishedPosts);
-router.route('/:slug').get(getPostBySlug);
+router.route('/').get(optionalAuth, getPosts);
+router.route('/grouped').get(getPostsGroupedByCategory);
+router.route('/:slug').get(optionalAuth, getPostBySlug);
 
 router.route('/').post(protect, createPost);
 

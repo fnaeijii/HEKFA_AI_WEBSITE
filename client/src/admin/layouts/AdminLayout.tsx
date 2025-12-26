@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { LayoutDashboard, Users, Briefcase, FileText, BookOpenCheck, Calendar, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, FileText, BookOpenCheck, Calendar, Settings, LogOut, ChevronDown, Brain, Leaf, Sparkles } from 'lucide-react';
 import { useMemo } from 'react';
 
 const NavItem = ({ to, icon: Icon, children }: { to: string, icon: React.ElementType, children: React.ReactNode }) => (
@@ -40,6 +40,9 @@ const AdminLayout = () => {
     { to: '/admin/projects', icon: Briefcase, label: 'Projects' },
     { to: '/admin/research', icon: FileText, label: 'Research' },
     { to: '/admin/case-studies', icon: BookOpenCheck, label: 'Case Studies' },
+    { to: '/admin/intelligence', icon: Brain, label: 'Intelligence' },
+    { to: '/admin/energy-blog', icon: Leaf, label: 'Energy Blog' },
+    { to: '/admin/creativity', icon: Sparkles, label: 'Creativity' },
     { to: '/admin/events', icon: Calendar, label: 'Events' },
     { to: '/admin/settings', icon: Settings, label: 'Site Settings' },
   ];

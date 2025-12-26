@@ -7,6 +7,10 @@ const eventSchema = new mongoose.Schema(
       required: [true, 'Event title is required'],
       trim: true,
     },
+    titleFa: {
+      type: String,
+      trim: true,
+    },
     date: {
       type: Date,
       required: [true, 'Event date is required'],
@@ -16,9 +20,16 @@ const eventSchema = new mongoose.Schema(
       required: [true, 'Event location is required'],
       trim: true,
     },
+    locationFa: {
+      type: String,
+      trim: true,
+    },
     description: {
       type: String,
       required: [true, 'A short description is required'],
+    },
+    descriptionFa: {
+      type: String,
     },
     boothNumber: {
         type: String,
@@ -27,6 +38,9 @@ const eventSchema = new mongoose.Schema(
     registrationUrl: {
       type: String,
       trim: true,
+    },
+    imageUrl: {
+      type: String,
     },
     isActive: {
         type: Boolean,

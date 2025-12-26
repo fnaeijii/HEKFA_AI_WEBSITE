@@ -145,13 +145,52 @@ const ManageSettingsPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             {companyStats.map((stat, index) => (
-              <div key={index} className="flex gap-4 items-end p-4 border rounded-md">
-                <InputWithLabel label="Value (e.g., 500+)" value={stat.value} onChange={e => handleItemChange(index, 'value', e.target.value, companyStats, setCompanyStats)} />
-                <InputWithLabel label="Label (e.g., AI Projects)" value={stat.label} onChange={e => handleItemChange(index, 'label', e.target.value, companyStats, setCompanyStats)} />
-                <Button variant="destructive" size="icon" onClick={() => handleRemoveItem(index, companyStats, setCompanyStats)}><Trash2 className="h-4 w-4" /></Button>
+              <div key={index} className="space-y-4 p-4 border rounded-md">
+                <BilingualInput
+                  label="Value"
+                  englishValue={stat.value}
+                  persianValue={stat.valueFa || ''}
+                  onChange={(lang, value) =>
+                    handleItemChange(
+                      index,
+                      lang === 'en' ? 'value' : 'valueFa',
+                      value,
+                      companyStats,
+                      setCompanyStats
+                    )
+                  }
+                />
+                <BilingualInput
+                  label="Label"
+                  englishValue={stat.label}
+                  persianValue={stat.labelFa || ''}
+                  onChange={(lang, value) =>
+                    handleItemChange(
+                      index,
+                      lang === 'en' ? 'label' : 'labelFa',
+                      value,
+                      companyStats,
+                      setCompanyStats
+                    )
+                  }
+                />
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => handleRemoveItem(index, companyStats, setCompanyStats)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             ))}
-            <Button variant="outline" onClick={() => handleAddItem({ value: '', label: '' }, companyStats, setCompanyStats)}><PlusCircle className="mr-2 h-4 w-4" /> Add Company Stat</Button>
+            <Button
+              variant="outline"
+              onClick={() =>
+                handleAddItem({ value: '', valueFa: '', label: '', labelFa: '' }, companyStats, setCompanyStats)
+              }
+            >
+              <PlusCircle className="mr-2 h-4 w-4" /> Add Company Stat
+            </Button>
           </CardContent>
         </Card>
 
@@ -163,14 +202,57 @@ const ManageSettingsPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             {researchStats.map((stat, index) => (
-              <div key={index} className="flex gap-4 items-end p-4 border rounded-md">
-                <InputWithLabel label="Label" value={stat.label} onChange={e => handleItemChange(index, 'label', e.target.value, researchStats, setResearchStats)} />
-                <InputWithLabel label="Value" value={stat.value} onChange={e => handleItemChange(index, 'value', e.target.value, researchStats, setResearchStats)} />
-                <InputWithLabel label="Icon Name" value={stat.icon} onChange={e => handleItemChange(index, 'icon', e.target.value, researchStats, setResearchStats)} />
-                <Button variant="destructive" size="icon" onClick={() => handleRemoveItem(index, researchStats, setResearchStats)}><Trash2 className="h-4 w-4" /></Button>
+              <div key={index} className="space-y-4 p-4 border rounded-md">
+                <BilingualInput
+                  label="Label"
+                  englishValue={stat.label}
+                  persianValue={stat.labelFa || ''}
+                  onChange={(lang, value) =>
+                    handleItemChange(
+                      index,
+                      lang === 'en' ? 'label' : 'labelFa',
+                      value,
+                      researchStats,
+                      setResearchStats
+                    )
+                  }
+                />
+                <BilingualInput
+                  label="Value"
+                  englishValue={stat.value}
+                  persianValue={stat.valueFa || ''}
+                  onChange={(lang, value) =>
+                    handleItemChange(
+                      index,
+                      lang === 'en' ? 'value' : 'valueFa',
+                      value,
+                      researchStats,
+                      setResearchStats
+                    )
+                  }
+                />
+                <InputWithLabel
+                  label="Icon Name"
+                  value={stat.icon}
+                  onChange={(e) => handleItemChange(index, 'icon', e.target.value, researchStats, setResearchStats)}
+                />
+                <Button variant="destructive" size="icon" onClick={() => handleRemoveItem(index, researchStats, setResearchStats)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             ))}
-            <Button variant="outline" onClick={() => handleAddItem({ label: '', value: '', icon: '' }, researchStats, setResearchStats)}><PlusCircle className="mr-2 h-4 w-4" /> Add Stat</Button>
+            <Button
+              variant="outline"
+              onClick={() =>
+                handleAddItem(
+                  { label: '', labelFa: '', value: '', valueFa: '', icon: '' },
+                  researchStats,
+                  setResearchStats
+                )
+              }
+            >
+              <PlusCircle className="mr-2 h-4 w-4" /> Add Stat
+            </Button>
           </CardContent>
         </Card>
 
@@ -182,15 +264,62 @@ const ManageSettingsPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             {contactInfo.map((item, index) => (
-               <div key={index} className="flex gap-4 items-end p-4 border rounded-md">
-                <InputWithLabel label="Title" value={item.title} onChange={e => handleItemChange(index, 'title', e.target.value, contactInfo, setContactInfo)} />
-                <InputWithLabel label="Description" value={item.description || ''} onChange={e => handleItemChange(index, 'description', e.target.value, contactInfo, setContactInfo)} />
-                <InputWithLabel label="Value" value={item.value} onChange={e => handleItemChange(index, 'value', e.target.value, contactInfo, setContactInfo)} />
-                <InputWithLabel label="Icon Name" value={item.icon} onChange={e => handleItemChange(index, 'icon', e.target.value, contactInfo, setContactInfo)} />
-                <Button variant="destructive" size="icon" onClick={() => handleRemoveItem(index, contactInfo, setContactInfo)}><Trash2 className="h-4 w-4" /></Button>
+              <div key={index} className="space-y-4 p-4 border rounded-md">
+                <BilingualInput
+                  label="Title"
+                  englishValue={item.title}
+                  persianValue={item.titleFa || ''}
+                  onChange={(lang, value) =>
+                    handleItemChange(
+                      index,
+                      lang === 'en' ? 'title' : 'titleFa',
+                      value,
+                      contactInfo,
+                      setContactInfo
+                    )
+                  }
+                />
+                <BilingualInput
+                  label="Description"
+                  englishValue={item.description || ''}
+                  persianValue={item.descriptionFa || ''}
+                  onChange={(lang, value) =>
+                    handleItemChange(
+                      index,
+                      lang === 'en' ? 'description' : 'descriptionFa',
+                      value,
+                      contactInfo,
+                      setContactInfo
+                    )
+                  }
+                />
+                <InputWithLabel
+                  label="Value"
+                  value={item.value}
+                  onChange={(e) => handleItemChange(index, 'value', e.target.value, contactInfo, setContactInfo)}
+                />
+                <InputWithLabel
+                  label="Icon Name"
+                  value={item.icon}
+                  onChange={(e) => handleItemChange(index, 'icon', e.target.value, contactInfo, setContactInfo)}
+                />
+                <Button variant="destructive" size="icon" onClick={() => handleRemoveItem(index, contactInfo, setContactInfo)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             ))}
-            <Button variant="outline" onClick={() => handleAddItem({ title: '', description: '', value: '', icon: '' }, contactInfo, setContactInfo)}><PlusCircle className="mr-2 h-4 w-4" /> Add Contact Item</Button>
+            <Button
+              variant="outline"
+              onClick={() =>
+                handleAddItem(
+                  { title: '', titleFa: '', description: '', descriptionFa: '', value: '', icon: '' },
+                  contactInfo,
+                  setContactInfo
+                )
+              }
+            >
+              <PlusCircle className="mr-2 h-4 w-4" /> Add Contact Item
+            </Button>
           </CardContent>
         </Card>
 
@@ -202,16 +331,101 @@ const ManageSettingsPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             {globalOffices.map((office, index) => (
-              <div key={index} className="grid grid-cols-2 gap-4 p-4 border rounded-md relative">
-                 <Button variant="destructive" size="icon" className="absolute top-4 right-4" onClick={() => handleRemoveItem(index, globalOffices, setGlobalOffices)}><Trash2 className="h-4 w-4" /></Button>
-                <InputWithLabel label="City" value={office.city} onChange={e => handleItemChange(index, 'city', e.target.value, globalOffices, setGlobalOffices)} vertical/>
-                <InputWithLabel label="Country" value={office.country} onChange={e => handleItemChange(index, 'country', e.target.value, globalOffices, setGlobalOffices)} vertical/>
-                <InputWithLabel label="Address" value={office.address} onChange={e => handleItemChange(index, 'address', e.target.value, globalOffices, setGlobalOffices)} vertical/>
-                <InputWithLabel label="Phone" value={office.phone} onChange={e => handleItemChange(index, 'phone', e.target.value, globalOffices, setGlobalOffices)} vertical/>
-                <InputWithLabel label="Type" value={office.type} onChange={e => handleItemChange(index, 'type', e.target.value, globalOffices, setGlobalOffices)} vertical/>
+              <div key={index} className="space-y-4 p-4 border rounded-md relative">
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-4 right-4"
+                  onClick={() => handleRemoveItem(index, globalOffices, setGlobalOffices)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+                <BilingualInput
+                  label="City"
+                  englishValue={office.city}
+                  persianValue={office.cityFa || ''}
+                  onChange={(lang, value) =>
+                    handleItemChange(
+                      index,
+                      lang === 'en' ? 'city' : 'cityFa',
+                      value,
+                      globalOffices,
+                      setGlobalOffices
+                    )
+                  }
+                />
+                <BilingualInput
+                  label="Country"
+                  englishValue={office.country}
+                  persianValue={office.countryFa || ''}
+                  onChange={(lang, value) =>
+                    handleItemChange(
+                      index,
+                      lang === 'en' ? 'country' : 'countryFa',
+                      value,
+                      globalOffices,
+                      setGlobalOffices
+                    )
+                  }
+                />
+                <BilingualInput
+                  label="Address"
+                  englishValue={office.address}
+                  persianValue={office.addressFa || ''}
+                  onChange={(lang, value) =>
+                    handleItemChange(
+                      index,
+                      lang === 'en' ? 'address' : 'addressFa',
+                      value,
+                      globalOffices,
+                      setGlobalOffices
+                    )
+                  }
+                />
+                <InputWithLabel
+                  label="Phone"
+                  value={office.phone}
+                  onChange={(e) => handleItemChange(index, 'phone', e.target.value, globalOffices, setGlobalOffices)}
+                  vertical
+                />
+                <BilingualInput
+                  label="Type"
+                  englishValue={office.type}
+                  persianValue={office.typeFa || ''}
+                  onChange={(lang, value) =>
+                    handleItemChange(
+                      index,
+                      lang === 'en' ? 'type' : 'typeFa',
+                      value,
+                      globalOffices,
+                      setGlobalOffices
+                    )
+                  }
+                />
               </div>
             ))}
-             <Button variant="outline" onClick={() => handleAddItem({ city: '', country: '', address: '', phone: '', type: 'Branch' }, globalOffices, setGlobalOffices)}><PlusCircle className="mr-2 h-4 w-4" /> Add Office</Button>
+             <Button
+               variant="outline"
+               onClick={() =>
+                 handleAddItem(
+                   {
+                     city: '',
+                     cityFa: '',
+                     country: '',
+                     countryFa: '',
+                     address: '',
+                     addressFa: '',
+                     phone: '',
+                     type: 'Branch',
+                     typeFa: '',
+                   },
+                   globalOffices,
+                   setGlobalOffices
+                 )
+               }
+             >
+               <PlusCircle className="mr-2 h-4 w-4" /> Add Office
+             </Button>
           </CardContent>
         </Card>
       </div>
@@ -220,10 +434,49 @@ const ManageSettingsPage = () => {
 };
 
 // Helper component
-const InputWithLabel = ({ label, value, onChange, vertical = false }: { label: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; vertical?: boolean; }) => (
+const InputWithLabel = ({
+  label,
+  value,
+  onChange,
+  vertical = false,
+}: {
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  vertical?: boolean;
+}) => (
   <div className={`w-full ${vertical ? 'flex flex-col' : 'grid'}`}>
     <Label className="mb-2 text-sm font-medium">{label}</Label>
     <Input value={value} onChange={onChange} />
+  </div>
+);
+
+const BilingualInput = ({
+  label,
+  englishValue,
+  persianValue,
+  onChange,
+}: {
+  label: string;
+  englishValue: string;
+  persianValue: string;
+  onChange: (lang: 'en' | 'fa', value: string) => void;
+}) => (
+  <div className="space-y-2">
+    <Label className="text-sm font-medium">{label}</Label>
+    <div className="grid gap-2 md:grid-cols-2">
+      <Input
+        placeholder="English"
+        value={englishValue}
+        onChange={(e) => onChange('en', e.target.value)}
+      />
+      <Input
+        dir="rtl"
+        placeholder="فارسی"
+        value={persianValue}
+        onChange={(e) => onChange('fa', e.target.value)}
+      />
+    </div>
   </div>
 );
 

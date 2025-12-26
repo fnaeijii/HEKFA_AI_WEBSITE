@@ -4,11 +4,15 @@ const researchStatSchema = new mongoose.Schema({
   label: { type: String, required: true },
   value: { type: String, required: true },
   icon: { type: String, required: true },
+  labelFa: { type: String },
+  valueFa: { type: String },
 });
 
 const companyStatSchema = new mongoose.Schema({
     value: { type: String, required: true },
     label: { type: String, required: true },
+    valueFa: { type: String },
+    labelFa: { type: String },
 });
 
 const contactInfoSchema = new mongoose.Schema({
@@ -16,6 +20,8 @@ const contactInfoSchema = new mongoose.Schema({
   description: { type: String },
   value: { type: String, required: true },
   icon: { type: String, required: true },
+  titleFa: { type: String },
+  descriptionFa: { type: String },
 });
 
 const officeSchema = new mongoose.Schema({
@@ -24,6 +30,10 @@ const officeSchema = new mongoose.Schema({
   address: { type: String, required: true },
   phone: { type: String, required: true },
   type: { type: String, enum: ['Headquarters', 'European Office', 'Asia Pacific Office', 'Branch'] },
+  cityFa: { type: String },
+  countryFa: { type: String },
+  addressFa: { type: String },
+  typeFa: { type: String },
 });
 
 const siteConfigSchema = new mongoose.Schema(

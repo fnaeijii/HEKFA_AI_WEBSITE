@@ -11,8 +11,23 @@ const getProjects = async (req, res) => {
       filter.isFeatured = true;
     }
     // مرتب‌سازی پروژه‌ها بر اساس فیلد isFeatured (پروژه‌های ویژه اول) و سپس زمان ساخت
-    const projects = await Project.find(filter).sort({ isFeatured: -1, createdAt: -1 });
-    res.json(projects);
+    const projects = await Project.find(filter)
+      .sort({ isFeatured: -1, createdAt: -1 })
+      .lean();
+
+    const projectsWithRandomImages = projects.map(project => {
+      const images = Array.isArray(project.slideshowImages) ? project.slideshowImages : [];
+      const randomImage = images.length > 0 
+        ? images[Math.floor(Math.random() * images.length)]?.url 
+        : null;
+
+      return {
+        ...project,
+        randomSlideshowImage: randomImage || project.mainImageUrl || null,
+      };
+    });
+
+    res.json(projectsWithRandomImages);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
@@ -41,9 +56,36 @@ const getProjectBySlug = async (req, res) => {
 const createProject = async (req, res) => {
   try {
     // --- فیلدها با مدل جدید هماهنگ شدند ---
-    const { 
-      title, slug, category, description, overview, status, isFeatured,
-      technologies, keyFeatures, mainImageUrl, demoUrl, videoUrl 
+    const {
+      title,
+      titleFa,
+      slug,
+      category,
+      categoryIcon,
+      description,
+      descriptionFa,
+      overview,
+      overviewFa,
+      overviewDetails,
+      status,
+      isFeatured,
+      heroButtons,
+      projectInfo,
+      video,
+      features,
+      architecture,
+      challenges,
+      performance,
+      results,
+      useCases,
+      testimonials,
+      ctaSection,
+      mainImageUrl,
+      slideshowImages,
+      demoUrl,
+      videoUrl,
+      metrics,
+      icon
     } = req.body;
     
     const projectExists = await Project.findOne({ slug });
@@ -52,8 +94,35 @@ const createProject = async (req, res) => {
     }
 
     const project = await Project.create({
-      title, slug, category, description, overview, status, isFeatured,
-      technologies, keyFeatures, mainImageUrl, demoUrl, videoUrl
+      title,
+      titleFa,
+      slug,
+      category,
+      categoryIcon,
+      description,
+      descriptionFa,
+      overview,
+      overviewFa,
+      overviewDetails,
+      status,
+      isFeatured,
+      heroButtons,
+      projectInfo,
+      video,
+      features,
+      architecture,
+      challenges,
+      performance,
+      results,
+      useCases,
+      testimonials,
+      ctaSection,
+      mainImageUrl,
+      slideshowImages,
+      demoUrl,
+      videoUrl,
+      metrics,
+      icon
     });
     res.status(201).json(project);
   } catch (error) {
@@ -70,27 +139,48 @@ const updateProject = async (req, res) => {
 
     if (project) {
       // --- فیلدهای ارسالی از req.body را استخراج می‌کنیم ---
-      const { 
-        title, slug, category, description, overview, status, isFeatured,
-        technologies, keyFeatures, mainImageUrl, demoUrl, videoUrl 
-      } = req.body;
+      const updatableFields = [
+        'title',
+        'titleFa',
+        'slug',
+        'category',
+        'categoryIcon',
+        'description',
+        'descriptionFa',
+        'overview',
+        'overviewFa',
+        'overviewDetails',
+        'status',
+        'heroButtons',
+        'projectInfo',
+        'video',
+        'features',
+        'architecture',
+        'challenges',
+        'performance',
+        'results',
+        'useCases',
+        'testimonials',
+        'ctaSection',
+        'mainImageUrl',
+        'demoUrl',
+        'videoUrl',
+        'metrics',
+        'icon'
+      ];
 
-      // --- به‌روزرسانی هوشمند: فقط فیلدهایی که در درخواست وجود دارند آپدیت می‌شوند ---
-      if (title) project.title = title;
-      if (slug) project.slug = slug;
-      if (category) project.category = category;
-      if (description) project.description = description;
-      if (overview) project.overview = overview;
-      if (status) project.status = status;
-      if (technologies) project.technologies = technologies; // آرایه کامل جایگزین می‌شود
-      if (keyFeatures) project.keyFeatures = keyFeatures; // آرایه کامل جایگزین می‌شود
-      if (mainImageUrl) project.mainImageUrl = mainImageUrl;
-      if (demoUrl) project.demoUrl = demoUrl;
-      if (videoUrl) project.videoUrl = videoUrl;
-      
-      // برای فیلد boolean باید به صورت جداگانه بررسی شود
-      if (typeof isFeatured === 'boolean') {
-        project.isFeatured = isFeatured;
+      updatableFields.forEach((field) => {
+        if (typeof req.body[field] !== 'undefined') {
+          project[field] = req.body[field];
+        }
+      });
+
+      if (Array.isArray(req.body.slideshowImages)) {
+        project.slideshowImages = req.body.slideshowImages;
+      }
+
+      if (typeof req.body.isFeatured === 'boolean') {
+        project.isFeatured = req.body.isFeatured;
       }
 
       const updatedProject = await project.save();

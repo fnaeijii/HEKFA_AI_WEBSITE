@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
 import api from '@/lib/axiosConfig';
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,12 +12,17 @@ import { Mail, Phone, MapPin, Clock, MessageSquare, Users, Handshake, Wrench, Lo
 import { Skeleton } from "@/components/ui/skeleton"; // <<-- Skeleton اضافه شد
 import FloatingParticles from "@/components/effects/FloatingParticles";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
+import { selectLocalized } from "@/lib/utils";
 
 // --- 1. تعریف Interfaceها برای داده‌های داینامیک ---
 interface ContactInfoItem {
   title: string;
   description: string;
   value: string;
+  titleFa?: string;
+  descriptionFa?: string;
+  valueFa?: string;
   icon: string; // نام آیکون به صورت رشته دریافت می‌شود
   link: string;
 }
@@ -29,6 +33,10 @@ interface Office {
   address: string;
   phone: string;
   type: string;
+  cityFa?: string;
+  countryFa?: string;
+  addressFa?: string;
+  typeFa?: string;
 }
 
 const iconMap: { [key: string]: React.ElementType } = {
@@ -39,6 +47,7 @@ const iconMap: { [key: string]: React.ElementType } = {
 };
 
 const Contact = () => {
+  const { t, i18n } = useTranslation();
   // State برای مدیریت داده‌های فرم
   const [formData, setFormData] = useState({
     firstName: '',
@@ -109,10 +118,10 @@ const Contact = () => {
   };
 
   const inquiryTypes = [
-    { title: "General Inquiry", description: "Questions about our AI solutions and services", icon: MessageSquare, color: "primary" },
-    { title: "Partnership", description: "Collaboration and business partnership opportunities", icon: Handshake, color: "secondary" },
-    { title: "Technical Support", description: "Technical assistance and implementation support", icon: Wrench, color: "accent" },
-    { title: "Careers", description: "Join our team of AI innovators", icon: Users, color: "primary" },
+    { title: t("contact.form.inquiryGeneral") || "General Inquiry", description: t("contact.form.inquiryGeneralDesc") || "Questions about our AI solutions and services", icon: MessageSquare, color: "primary" },
+    { title: t("contact.form.inquiryPartner") || "Partnership", description: t("contact.form.inquiryPartnerDesc") || "Collaboration and business partnership opportunities", icon: Handshake, color: "secondary" },
+    { title: t("contact.form.inquirySupport") || "Technical Support", description: t("contact.form.inquirySupportDesc") || "Technical assistance and implementation support", icon: Wrench, color: "accent" },
+    { title: t("contact.form.inquiryCareers") || "Careers", description: t("contact.form.inquiryCareersDesc") || "Join our team of AI innovators", icon: Users, color: "primary" },
   ];
 
   
@@ -124,14 +133,13 @@ const Contact = () => {
         <div className="container mx-auto px-6">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-16">
             <Badge variant="outline" className="mb-6 border-primary/30 text-primary bg-primary/10 px-4 py-2">
-              <MessageSquare className="h-4 w-4 mr-2" /> Get in Touch
+              <MessageSquare className="h-4 w-4 mr-2" /> {t("contact.hero.badge")}
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 glow-text">
-              Let's Build the Future of{" "}
-              <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">AI Together</span>
+              {t("contact.hero.title")}
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Ready to transform your business with cutting-edge AI solutions? Our team of experts is here to help you navigate the future of artificial intelligence.
+              {t("contact.hero.subtitle")}
             </p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
@@ -149,9 +157,15 @@ const Contact = () => {
                         <div className="p-3 rounded-lg bg-primary/10 w-fit mx-auto mb-4">
                           {IconComponent && <IconComponent className="h-6 w-6 text-primary" />}
                         </div>
-                        <h3 className="font-semibold mb-2">{info.title}</h3>
-                        <p className="text-sm text-muted-foreground mb-3">{info.description}</p>
-                        <div className="text-sm font-medium text-primary">{info.value}</div>
+                        <h3 className="font-semibold mb-2">
+                          {selectLocalized(info, "title", i18n.language) ?? info.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {selectLocalized(info, "description", i18n.language) ?? info.description}
+                        </p>
+                        <div className="text-sm font-medium text-primary">
+                          {selectLocalized(info, "value", i18n.language) ?? info.value}
+                        </div>
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -170,44 +184,55 @@ const Contact = () => {
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
               <Card className="neural-card">
                 <CardContent className="p-8">
-                  <h2 className="text-2xl font-bold mb-6 glow-text-secondary">Send Us a Message</h2>
+                  <h2 className="text-2xl font-bold mb-6 glow-text-secondary">
+                    {t("contact.form.title")}
+                  </h2>
                   <form className="space-y-6" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" placeholder="John" className="mt-2" value={formData.firstName} onChange={handleInputChange} required />
+                        <Label htmlFor="firstName">{t("contact.form.firstName")}</Label>
+                        <Input id="firstName" className="mt-2" value={formData.firstName} onChange={handleInputChange} required />
                       </div>
                       <div>
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" placeholder="Doe" className="mt-2" value={formData.lastName} onChange={handleInputChange} required />
+                        <Label htmlFor="lastName">{t("contact.form.lastName")}</Label>
+                        <Input id="lastName" className="mt-2" value={formData.lastName} onChange={handleInputChange} required />
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="email">Email Address</Label>
-                      <Input id="email" type="email" placeholder="john.doe@company.com" className="mt-2" value={formData.email} onChange={handleInputChange} required />
+                      <Label htmlFor="email">{t("contact.form.email")}</Label>
+                      <Input id="email" type="email" className="mt-2" value={formData.email} onChange={handleInputChange} required />
                     </div>
                     <div>
-                      <Label htmlFor="company">Company</Label>
-                      <Input id="company" placeholder="Your Company Name" className="mt-2" value={formData.company} onChange={handleInputChange} />
+                      <Label htmlFor="company">{t("contact.form.company")}</Label>
+                      <Input id="company" className="mt-2" value={formData.company} onChange={handleInputChange} />
                     </div>
                     <div>
-                      <Label htmlFor="inquiryType">Inquiry Type</Label>
+                      <Label htmlFor="inquiryType">{t("contact.form.inquiryType")}</Label>
                       <Select onValueChange={handleSelectChange} value={formData.inquiryType} required>
-                        <SelectTrigger className="mt-2"><SelectValue placeholder="Select inquiry type" /></SelectTrigger>
+                        <SelectTrigger className="mt-2">
+                          <SelectValue placeholder={t("contact.form.inquiryType")} />
+                        </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="General Inquiry">General Inquiry</SelectItem>
-                          <SelectItem value="Partnership">Partnership</SelectItem>
-                          <SelectItem value="Technical Support">Technical Support</SelectItem>
-                          <SelectItem value="Careers">Careers</SelectItem>
+                          <SelectItem value="General Inquiry">{t("contact.form.inquiryGeneral")}</SelectItem>
+                          <SelectItem value="Partnership">{t("contact.form.inquiryPartner")}</SelectItem>
+                          <SelectItem value="Technical Support">{t("contact.form.inquirySupport")}</SelectItem>
+                          <SelectItem value="Careers">{t("contact.form.inquiryCareers")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="message">Message</Label>
-                      <Textarea id="message" placeholder="Tell us about your project or inquiry..." rows={5} className="mt-2" value={formData.message} onChange={handleInputChange} required />
+                      <Label htmlFor="message">{t("contact.form.message")}</Label>
+                      <Textarea id="message" rows={5} className="mt-2" value={formData.message} onChange={handleInputChange} required />
                     </div>
                     <Button type="submit" className="btn-neural w-full" disabled={isSubmitting}>
-                      {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</>) : ("Send Message")}
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t("contact.form.submitting")}
+                        </>
+                      ) : (
+                        t("contact.form.submit")
+                      )}
                     </Button>
                   </form>
                 </CardContent>
@@ -216,7 +241,14 @@ const Contact = () => {
 
             {/* Inquiry Types */}
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-              <div className="mb-8"><h2 className="text-2xl font-bold mb-4 glow-text-secondary">How Can We Help?</h2><p className="text-muted-foreground">Choose the type of inquiry that best matches your needs, and we'll connect you with the right team member.</p></div>
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold mb-4 glow-text-secondary">
+                  {t("contact.inquiry.title")}
+                </h2>
+                <p className="text-muted-foreground">
+                  {t("contact.inquiry.description")}
+                </p>
+              </div>
               <div className="space-y-4">
                 {inquiryTypes.map((type, index) => (
                   <motion.div key={type.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: index * 0.1 }}>
@@ -224,7 +256,19 @@ const Contact = () => {
                   </motion.div>
                 ))}
               </div>
-              <Card className="neural-card mt-8"><CardContent className="p-6"><h3 className="font-semibold mb-4">Quick Response</h3><p className="text-muted-foreground text-sm mb-4">We typically respond to inquiries within 24 hours. For urgent matters, please call us directly.</p><Button variant="outline" className="btn-ghost-neural">Schedule a Call</Button></CardContent></Card>
+              <Card className="neural-card mt-8">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-4">
+                    {t("contact.inquiry.quickResponseTitle")}
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    {t("contact.inquiry.quickResponseBody")}
+                  </p>
+                  <Button variant="outline" className="btn-ghost-neural">
+                    {t("contact.inquiry.scheduleCall")}
+                  </Button>
+                </CardContent>
+              </Card>
             </motion.div>
           </div>
         </div>
@@ -234,8 +278,12 @@ const Contact = () => {
       <section className="py-20 relative">
         <div className="container mx-auto px-6">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 glow-text-secondary">Our Global Presence</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">With offices around the world, we're positioned to serve clients across different time zones and regions.</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 glow-text-secondary">
+              {t("contact.offices.title")}
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              {t("contact.offices.subtitle")}
+            </p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {loading ? (
@@ -247,13 +295,21 @@ const Contact = () => {
                 <motion.div key={office.city} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: index * 0.1 }}>
                   <Card className="neural-card h-full">
                     <CardContent className="p-8 text-center">
-                      <Badge variant="outline" className="mb-4">{office.type}</Badge>
-                      <h3 className="text-xl font-semibold mb-2">{office.city}</h3>
-                      <p className="text-muted-foreground mb-4">{office.country}</p>
+                      <Badge variant="outline" className="mb-4">
+                        {selectLocalized(office, "type", i18n.language) ?? office.type}
+                      </Badge>
+                      <h3 className="text-xl font-semibold mb-2">
+                        {selectLocalized(office, "city", i18n.language) ?? office.city}
+                      </h3>
+                      <p className="text-muted-foreground mb-4">
+                        {selectLocalized(office, "country", i18n.language) ?? office.country}
+                      </p>
                       <div className="space-y-3 text-sm">
                         <div className="flex items-center justify-center space-x-2">
                           <MapPin className="h-4 w-4 text-primary" />
-                          <span className="text-muted-foreground">{office.address}</span>
+                          <span className="text-muted-foreground">
+                            {selectLocalized(office, "address", i18n.language) ?? office.address}
+                          </span>
                         </div>
                         <div className="flex items-center justify-center space-x-2">
                           <Phone className="h-4 w-4 text-primary" />
@@ -273,10 +329,21 @@ const Contact = () => {
       <section className="py-20 relative">
         <FloatingParticles count={20} />
         <div className="container mx-auto px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 glow-text">Ready to Start Your AI Journey?</h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">Don't wait to revolutionize your business. Contact us today and discover how AI can transform your operations.</p>
-            <Button className="btn-neural">Get Started Today</Button>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 glow-text">
+              {t("contact.cta.title")}
+            </h2>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              {t("contact.cta.subtitle")}
+            </p>
+            <Button className="btn-neural">
+              {t("contact.cta.button")}
+            </Button>
           </motion.div>
         </div>
       </section>

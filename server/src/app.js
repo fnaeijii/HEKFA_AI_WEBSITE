@@ -14,6 +14,9 @@ const caseStudyRoutes = require('./routes/caseStudyRoutes');
 const uploadRoutes = require('./routes/uploadRoutes'); // <<-- این خط را اضافه کنید
 const eventRoutes = require('./routes/eventRoutes'); // <<-- 1. این خط را اضافه کنید
 const siteConfigRoutes = require('./routes/siteConfigRoutes'); // <<-- 1. این خط را اضافه کنید
+const intelligenceRoutes = require('./routes/intelligenceRoutes');
+const energyBlogRoutes = require('./routes/energyBlogRoutes');
+const creativityRoutes = require('./routes/creativityRoutes');
 
 // Connect to Database
 connectDB();
@@ -48,5 +51,8 @@ app.use('/api/case-studies', caseStudyRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/config', siteConfigRoutes);
+app.use('/api/intelligence', intelligenceRoutes);
+app.use('/api/energy-blogs', energyBlogRoutes);
+app.use('/api/creativity', creativityRoutes);
 
 module.exports = app;

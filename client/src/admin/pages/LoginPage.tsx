@@ -13,7 +13,7 @@ import { toast } from "sonner";
 const LoginPage = () => {
   const [email, setEmail] = useState('admin@example.com');
   const [password, setPassword] = useState('123456');
-  const navigate = useNavigate();ز
+  const navigate = useNavigate();
 
   const { mutate: loginUser, isPending: isLoading } = useMutation({
     mutationFn: (credentials: { email: string, password: string }) => {

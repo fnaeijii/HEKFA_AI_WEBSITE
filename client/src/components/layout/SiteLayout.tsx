@@ -2,11 +2,13 @@ import { Outlet } from 'react-router-dom';
 import Navigation from './Navigation';
 import Footer from './Footer';
 import NeuralBackground from '../effects/NeuralBackground';
+import { LayoutProvider } from '@/contexts/LayoutContext';
 // import AIChatbot from '../ui/AIChatbot';
 
 const SiteLayout = () => {
   return (
     <div className="min-h-screen relative">
+      <LayoutProvider>
       <NeuralBackground />
       <Navigation />
       <main>
@@ -15,6 +17,7 @@ const SiteLayout = () => {
       </main>
       <Footer />
       {/* <AIChatbot /> */}
+      </LayoutProvider>
     </div>
   );
 };

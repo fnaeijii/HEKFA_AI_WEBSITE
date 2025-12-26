@@ -10,18 +10,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Brain, Menu, X, Globe, ChevronDown } from "lucide-react";
+import { useLayout } from '@/contexts/LayoutContext'; // <-- ایمپورت هوک
 
 const Navigation = () => {
   const { t, i18n } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-
+  const isProjectsIndexPage = location.pathname === '/projects';
+  const { isHeroVisible } = useLayout(); // <-- استفاده از Context
   const navigationItems = [
     { name: t('nav.home'), path: "/" },
     { name: t('nav.about'), path: "/about" },
     { name: t('nav.projects'), path: "/projects" },
     { name: t('nav.research'), path: "/research" },
+    { name: t('nav.energy'), path: "/energy-blog" },
+    { name: t('nav.creativity'), path: "/creativity" },
     { name: t('nav.contact'), path: "/contact" },
   ];
 
@@ -42,16 +46,37 @@ const Navigation = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const getNavClassName = () => {
+    const isProjectsIndexPage = location.pathname === '/projects';
+    
+    // سناریوی ۱: اگر در صفحه اصلی پروژه‌ها هستیم
+    if (isProjectsIndexPage) {
+      // اگر در بخش سینمایی هستیم (isHeroVisible از Context می‌آید) -> شفاف
+      // اگر به Case Studies رسیدیم -> کدر و شیشه‌ای
+      return isHeroVisible
+        ? 'bg-transparent' // <-- استایل شفاف برای بخش سینمایی
+        : 'fixed top-0 left-0 right-0 z-50 transition-all duration-300';
+    }
+    
+    // سناریوی ۲: برای تمام صفحات دیگر
+    return scrolled
+      ? 'bg-background/90 backdrop-blur-md border-b border-border/50'
+      : 'bg-transparent';
+  };
+
   return (
+    // <nav
+    //   className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    //     scrolled
+    //       ? "bg-background/90 backdrop-blur-md border-b border-border/50"
+    //       : "bg-transparent"
+    //   }`}
+    // >
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-background/90 backdrop-blur-md border-b border-border/50"
-          : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${getNavClassName()}`}
     >
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
+      <div className="container mx-auto px-4 md:px-6 py-3">
+        <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="relative">
@@ -72,12 +97,12 @@ const Navigation = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-5 text-sm font-semibold uppercase tracking-wide">
             {navigationItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative px-4 py-2 rounded-lg transition-all duration-300 font-medium ${
+                className={`relative px-3 py-1.5 rounded-lg transition-all duration-300 whitespace-nowrap ${
                   location.pathname === item.path
                     ? "text-primary glow-text"
                     : "text-muted-foreground hover:text-foreground"
@@ -98,10 +123,10 @@ const Navigation = () => {
           </div>
 
           {/* Language Selector & CTA */}
-          <div className="hidden lg:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-muted-foreground">
+                <Button variant="ghost" size="sm" className="text-muted-foreground px-2">
                   <Globe className="h-4 w-4 mr-2" />
                   {currentLanguage.flag} {currentLanguage.code.toUpperCase()}
                   <ChevronDown className="h-3 w-3 ml-1" />
@@ -123,7 +148,7 @@ const Navigation = () => {
               </DropdownMenuContent>
             </DropdownMenu>
             <Link to="/contact">
-              <Button className="btn-neural">{t('nav.getStarted')}</Button>
+              <Button size="sm" className="btn-neural px-4 whitespace-nowrap">{t('nav.getStarted')}</Button>
             </Link>
           </div>
 
@@ -185,7 +210,7 @@ const Navigation = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="btn-neural">{t('nav.getStarted')}</Button>
+                    <Button className="btn-neural w-full mt-3">{t('nav.getStarted')}</Button>
                   </Link>                </div>
               </div>
             </motion.div>

@@ -1,70 +1,93 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/axiosConfig'; 
+import { useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import api from '@/lib/axiosConfig';
 import { toast } from 'sonner';
-
-// UI Components
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertTriangle, PlusCircle, MoreHorizontal } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertTriangle, Edit, MoreHorizontal, PlusCircle, Trash2, Users } from 'lucide-react';
 
-// --- Interfaces to match backend model ---
 interface TeamMember {
   _id: string;
   name: string;
+  nameFa?: string;
   role: string;
-  imageUrl: string;
+  roleFa?: string;
   specialty?: string;
+  specialtyFa?: string;
   bio: string;
+  bioFa?: string;
+  imageUrl: string;
   linkedinUrl?: string;
+  order?: number;
 }
 
-interface NewTeamMemberData {
-  name: string;
-  role: string;
-  imageUrl: string;
-  bio: string;
-  specialty?: string;
-  linkedinUrl?: string;
+interface LanguageValue {
+  en: string;
+  fa: string;
 }
 
-// --- API Functions ---
+const emptyLang: LanguageValue = { en: '', fa: '' };
+
 const fetchTeamMembers = async (): Promise<TeamMember[]> => {
-  const { data } = await api.get(`/team`);
-  return data;
-};
-
-const addTeamMember = async (newMember: NewTeamMemberData): Promise<TeamMember> => {
-  const { data } = await api.post(`/team`, newMember);
+  const { data } = await api.get('/team');
   return data;
 };
 
 const uploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('image', file);
-    const { data } = await api.post(`/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-    return data.url; 
+  const formData = new FormData();
+  formData.append('image', file);
+  const { data } = await api.post('/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data.url;
 };
 
-
 const ManageTeamPage = () => {
-  // --- State Management ---
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('');
-  const [bio, setBio] = useState('');
-  const [specialty, setSpecialty] = useState('');
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [name, setName] = useState<LanguageValue>(emptyLang);
+  const [role, setRole] = useState<LanguageValue>(emptyLang);
+  const [specialty, setSpecialty] = useState<LanguageValue>(emptyLang);
+  const [bio, setBio] = useState<LanguageValue>(emptyLang);
   const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [order, setOrder] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState('');
 
-  // --- React Query ---
   const queryClient = useQueryClient();
 
   const { data: members, isLoading, isError, error } = useQuery({
@@ -72,116 +95,210 @@ const ManageTeamPage = () => {
     queryFn: fetchTeamMembers,
   });
 
-  const { mutate: createMember, isPending: isCreating } = useMutation({
-    mutationFn: async (): Promise<TeamMember> => {
-      if (!imageFile) throw new Error("Please select an image.");
-      
-      const imageUrl = await uploadImage(imageFile);
-      
-      return addTeamMember({ name, role, imageUrl, bio, specialty, linkedinUrl });
-    },
+  const { mutateAsync: createMember, isPending: isCreating } = useMutation({
+    mutationFn: (payload: any) => api.post('/team', payload),
+  });
+
+  const { mutateAsync: updateMember, isPending: isUpdating } = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: any }) => api.put(`/team/${id}`, payload),
+  });
+
+  const { mutate: removeMember } = useMutation({
+    mutationFn: (id: string) => api.delete(`/team/${id}`),
     onSuccess: () => {
-      toast.success('Team member added successfully!');
+      toast.success('Team member deleted.');
       queryClient.invalidateQueries({ queryKey: ['teamMembers'] });
-      setIsDialogOpen(false); 
-      // Reset all form fields
-      setName('');
-      setRole('');
-      setBio('');
-      setSpecialty('');
-      setLinkedinUrl('');
-      setImageFile(null);
     },
-    onError: (error: any) => {
-      const errorMessage = error.response?.data?.error || error.response?.data?.message || "An unexpected error occurred.";
-      console.error("Error creating team member:", error.response?.data || error);
-      toast.error(errorMessage);
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || 'Failed to delete member.');
     },
   });
 
-  // --- Handlers ---
-  const handleSubmit = (e: React.FormEvent) => {
+  const resetForm = () => {
+    setName(emptyLang);
+    setRole(emptyLang);
+    setSpecialty(emptyLang);
+    setBio(emptyLang);
+    setLinkedinUrl('');
+    setOrder('');
+    setImageFile(null);
+    setImageUrl('');
+    setEditingMember(null);
+  };
+
+  const openCreateDialog = () => {
+    resetForm();
+    setIsDialogOpen(true);
+  };
+
+  const openEditDialog = (member: TeamMember) => {
+    setEditingMember(member);
+    setName({ en: member.name, fa: member.nameFa || '' });
+    setRole({ en: member.role, fa: member.roleFa || '' });
+    setSpecialty({ en: member.specialty || '', fa: member.specialtyFa || '' });
+    setBio({ en: member.bio, fa: member.bioFa || '' });
+    setLinkedinUrl(member.linkedinUrl || '');
+    setOrder(member.order?.toString() || '');
+    setImageUrl(member.imageUrl);
+    setImageFile(null);
+    setIsDialogOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !role || !bio || !imageFile) {
-      toast.error("Please fill Name, Role, Bio, and select an image.");
+    if (!name.en || !role.en || !bio.en) {
+      toast.error('Please fill in the required English fields.');
       return;
     }
-    createMember();
+
+    let finalImageUrl = imageUrl;
+    if (imageFile) {
+      try {
+        finalImageUrl = await uploadImage(imageFile);
+      } catch (uploadError: any) {
+        toast.error(uploadError.response?.data?.message || 'Failed to upload image.');
+        return;
+      }
+    }
+
+    if (!finalImageUrl) {
+      toast.error('Please upload an image.');
+      return;
+    }
+
+    const payload = {
+      name: name.en,
+      nameFa: name.fa || undefined,
+      role: role.en,
+      roleFa: role.fa || undefined,
+      specialty: specialty.en || undefined,
+      specialtyFa: specialty.fa || undefined,
+      bio: bio.en,
+      bioFa: bio.fa || undefined,
+      linkedinUrl: linkedinUrl || undefined,
+      imageUrl: finalImageUrl,
+      order: order ? Number(order) : undefined,
+    };
+
+    try {
+      if (editingMember) {
+        await updateMember({ id: editingMember._id, payload });
+        toast.success('Team member updated.');
+      } else {
+        await createMember(payload);
+        toast.success('Team member added.');
+      }
+      queryClient.invalidateQueries({ queryKey: ['teamMembers'] });
+      setIsDialogOpen(false);
+      resetForm();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to save member.');
+    }
   };
-  
-  const renderSkeletons = () => (
-    [...Array(3)].map((_, i) => (
-      <TableRow key={i}>
+
+  const renderSkeletons = () =>
+    [...Array(3)].map((_, idx) => (
+      <TableRow key={idx}>
         <TableCell>
           <div className="flex items-center gap-4">
             <Skeleton className="h-12 w-12 rounded-full" />
-            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-4 w-32" />
           </div>
         </TableCell>
-        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-        <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+        <TableCell>
+          <Skeleton className="h-4 w-24" />
+        </TableCell>
+        <TableCell className="text-right">
+          <Skeleton className="h-8 w-8 ml-auto" />
+        </TableCell>
       </TableRow>
-    ))
-  );
+    ));
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Manage Team Members</h1>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Users className="h-7 w-7 text-primary" />
+          <h1 className="text-3xl font-bold">Manage Team Members</h1>
+        </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" /> Add New Member
+            <Button onClick={openCreateDialog}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Member
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[525px]">
+          <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Add New Team Member</DialogTitle>
-              <DialogDescription>Fill in the details below to add a new member to your team.</DialogDescription>
+              <DialogTitle>{editingMember ? 'Edit Team Member' : 'New Team Member'}</DialogTitle>
+              <DialogDescription>Provide bilingual details for this teammate.</DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit}>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">Name <span className="text-red-500">*</span></Label>
-                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="col-span-3" />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="role" className="text-right">Role <span className="text-red-500">*</span></Label>
-                    <Input id="role" value={role} onChange={(e) => setRole(e.target.value)} className="col-span-3" />
-                  </div>
-                  <div className="grid grid-cols-4 items-start gap-4">
-                    <Label htmlFor="bio" className="text-right mt-2">Bio <span className="text-red-500">*</span></Label>
-                    <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} className="col-span-3" placeholder="A short biography..." />
-                  </div>
-                   <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="specialty" className="text-right">Specialty</Label>
-                    <Input id="specialty" value={specialty} onChange={(e) => setSpecialty(e.target.value)} className="col-span-3" placeholder="e.g., AI Research" />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="linkedinUrl" className="text-right">LinkedIn URL</Label>
-                    <Input id="linkedinUrl" value={linkedinUrl} onChange={(e) => setLinkedinUrl(e.target.value)} className="col-span-3" placeholder="https://linkedin.com/in/..." />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="picture" className="text-right">Picture <span className="text-red-500">*</span></Label>
-                    <Input id="picture" type="file" onChange={(e) => e.target.files && setImageFile(e.target.files[0])} className="col-span-3" />
-                  </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid gap-4 md:grid-cols-2">
+                <BilingualField label="Name" value={name} onChange={setName} required />
+                <BilingualField label="Role" value={role} onChange={setRole} required />
+              </div>
+              <BilingualField label="Specialty" value={specialty} onChange={setSpecialty} />
+              <BilingualField label="Bio" value={bio} onChange={setBio} textarea required />
+              <div className="grid gap-4 md:grid-cols-2">
+                <InputWithLabel
+                  id="linkedin"
+                  label="LinkedIn URL"
+                  value={linkedinUrl}
+                  onChange={(e) => setLinkedinUrl(e.target.value)}
+                  placeholder="https://linkedin.com/in/..."
+                />
+                <InputWithLabel
+                  id="order"
+                  label="Order"
+                  type="number"
+                  value={order}
+                  onChange={(e) => setOrder(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label>Profile Image</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      setImageFile(file);
+                      if (file) {
+                        setImageUrl('');
+                      }
+                    }}
+                  />
                 </div>
-                <DialogFooter>
-                  <Button type="submit" disabled={isCreating}>
-                    {isCreating ? 'Adding...' : 'Add Member'}
-                  </Button>
-                </DialogFooter>
+                <InputWithLabel
+                  id="imageUrl"
+                  label="Image URL"
+                  value={imageUrl}
+                  onChange={(e) => {
+                    setImageUrl(e.target.value);
+                    if (e.target.value) setImageFile(null);
+                  }}
+                  placeholder="https://..."
+                />
+              </div>
+              <DialogFooter>
+                <Button type="submit" disabled={isCreating || isUpdating}>
+                  {isCreating || isUpdating ? 'Saving...' : editingMember ? 'Save Changes' : 'Add Member'}
+                </Button>
+              </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
       </div>
-      
+
       <div className="bg-card rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Role</TableHead>
+              <TableHead>Order</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -190,8 +307,11 @@ const ManageTeamPage = () => {
               renderSkeletons()
             ) : isError ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-destructive py-10">
-                  <div className='flex justify-center items-center gap-2'> <AlertTriangle className="h-5 w-5" /> <span>Error: {error.message}</span></div>
+                <TableCell colSpan={4} className="py-10 text-center text-destructive">
+                  <div className="flex items-center justify-center gap-2">
+                    <AlertTriangle className="h-5 w-5" />
+                    <span>Error: {error?.message}</span>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : members && members.length > 0 ? (
@@ -203,24 +323,57 @@ const ManageTeamPage = () => {
                         <AvatarImage src={`${import.meta.env.VITE_API_URL}${member.imageUrl}`} alt={member.name} />
                         <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
                       </Avatar>
-                      <span className="font-medium text-card-foreground">{member.name}</span>
+                      <span className="font-medium">{member.name}</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{member.role}</TableCell>
+                  <TableCell className="text-muted-foreground">{member.order ?? 0}</TableCell>
                   <TableCell className="text-right">
-                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive focus:text-destructive">Delete</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <AlertDialog>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => openEditDialog(member)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <AlertDialogTrigger asChild>
+                            <DropdownMenuItem className="text-destructive focus:text-destructive">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </AlertDialogTrigger>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete “{member.name}”?</AlertDialogTitle>
+                          <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive hover:bg-destructive/90"
+                            onClick={() => removeMember(member._id)}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-muted-foreground py-10">No team members found. Start by adding one.</TableCell>
+                <TableCell colSpan={4} className="py-10 text-center text-muted-foreground">
+                  No team members yet.
+                </TableCell>
               </TableRow>
             )}
           </TableBody>
@@ -229,5 +382,66 @@ const ManageTeamPage = () => {
     </div>
   );
 };
+
+const BilingualField = ({
+  label,
+  value,
+  onChange,
+  textarea,
+  required,
+}: {
+  label: string;
+  value: LanguageValue;
+  onChange: (val: LanguageValue) => void;
+  textarea?: boolean;
+  required?: boolean;
+}) => (
+  <div className="space-y-2">
+    <Label className="text-sm font-medium">
+      {label} {required && <span className="text-destructive">*</span>}
+    </Label>
+    <Tabs defaultValue="en">
+      <TabsList>
+        <TabsTrigger value="en">English</TabsTrigger>
+        <TabsTrigger value="fa">فارسی</TabsTrigger>
+      </TabsList>
+      <TabsContent value="en" className="mt-2">
+        {textarea ? (
+          <Textarea value={value.en} onChange={(e) => onChange({ ...value, en: e.target.value })} />
+        ) : (
+          <Input value={value.en} onChange={(e) => onChange({ ...value, en: e.target.value })} />
+        )}
+      </TabsContent>
+      <TabsContent value="fa" className="mt-2">
+        {textarea ? (
+          <Textarea dir="rtl" value={value.fa} onChange={(e) => onChange({ ...value, fa: e.target.value })} />
+        ) : (
+          <Input dir="rtl" value={value.fa} onChange={(e) => onChange({ ...value, fa: e.target.value })} />
+        )}
+      </TabsContent>
+    </Tabs>
+  </div>
+);
+
+const InputWithLabel = ({
+  id,
+  label,
+  value,
+  onChange,
+  type = 'text',
+  placeholder,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  type?: string;
+  placeholder?: string;
+}) => (
+  <div className="grid gap-2">
+    <Label htmlFor={id}>{label}</Label>
+    <Input id={id} type={type} value={value} onChange={onChange} placeholder={placeholder} />
+  </div>
+);
 
 export default ManageTeamPage;

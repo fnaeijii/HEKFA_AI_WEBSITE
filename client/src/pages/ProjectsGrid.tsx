@@ -1,9 +1,8 @@
 // src/pages/Projects.tsx - FINAL FIX for Image URL Pathing
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion'; // --- CHANGE 1: New imports
+import { motion, useScroll, useTransform } from 'framer-motion';
 import api from '@/lib/axiosConfig';
-// import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,15 +15,20 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom'; // <-- ۱. وارد کردن Link
+import { Link } from 'react-router-dom';
+import { useLayout } from '@/contexts/LayoutContext';
+import { useTranslation } from "react-i18next";
+import { selectLocalized } from "@/lib/utils";
 
 interface Project {
   _id: string;
   slug: string;
   title: string;
+  titleFa?: string;
   description: string;
+  descriptionFa?: string;
   category: string;
-  technologies: string[];
+  technologies?: string[];
   mainImageUrl?: string;
 }
 
@@ -32,20 +36,55 @@ interface CaseStudy {
   _id: string;
   slug: string;
   title: string;
+  titleFa?: string;
   client: string;
+  clientFa?: string;
   description: string;
+  descriptionFa?: string;
   technologies: string[];
-  imageUrl: string;
+  imageUrl?: string;
 }
 
 const CinematicSection = ({ project, index }: { project: Project; index: number; }) => {
   const fullImageUrl = project.mainImageUrl ? `${import.meta.env.VITE_API_URL}${project.mainImageUrl}` : null;
   const sectionRef = useRef<HTMLDivElement>(null);
   const isFirstSection = index === 0;
+  const { setIsHeroVisible } = useLayout();
+  const sentinelRef = useRef<HTMLDivElement>(null); // دیده‌بان
+  const { i18n } = useTranslation();
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "start start"] });
   const scrollOpacity = useTransform(scrollYProgress, [0, 0.5], [0, 1]);
   const scrollY = useTransform(scrollYProgress, [0, 0.5], [50, 0]);
+  const title =
+    selectLocalized(project as any, "title", i18n.language) ?? project.title;
+  const description =
+    selectLocalized(project as any, "description", i18n.language) ??
+    project.description;
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        rootMargin: "-100px", // به اندازه ارتفاع Navbar، زودتر خبر بده
+        threshold: 0,
+      }
+    );
+
+    const currentRef = sentinelRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [setIsHeroVisible]);
 
   return (
     <section
@@ -73,8 +112,12 @@ const CinematicSection = ({ project, index }: { project: Project; index: number;
         transition={isFirstSection ? { duration: 0.8, delay: 0.5, ease: "easeOut" } : {}}
         style={!isFirstSection ? { opacity: scrollOpacity, y: scrollY } : {}}
       >
-        <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tighter">{project.title}</h1>
-        <p className="mt-4 text-lg text-white/80 max-w-2xl mx-auto">{project.description}</p>
+        <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tighter">
+          {title}
+        </h1>
+        <p className="mt-4 text-lg text-white/80 max-w-2xl mx-auto">
+          {description}
+        </p>
         
         {/* <-- ۴. راهنمای بصری برای کلیک کردن که در زمان هاور ظاهر می‌شود */}
         <motion.div 
@@ -96,9 +139,20 @@ const CinematicSection = ({ project, index }: { project: Project; index: number;
 
 // (The CaseStudyCard, CaseStudyCardSkeleton, and CaseStudiesSection components remain unchanged)
 const CaseStudyCard = ({ study, index }: { study: CaseStudy, index: number }) => {
-  const imageUrl = study.imageUrl.startsWith('http') 
-    ? study.imageUrl 
-    : `${import.meta.env.VITE_API_URL}${study.imageUrl}`;
+  const imageUrl = study.imageUrl 
+    ? (study.imageUrl.startsWith('http') 
+        ? study.imageUrl 
+        : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${study.imageUrl}`)
+    : null;
+
+  const { i18n } = useTranslation();
+  const displayTitle =
+    selectLocalized(study as any, "title", i18n.language) ?? study.title;
+  const displayClient =
+    selectLocalized(study as any, "client", i18n.language) ?? study.client;
+  const displayDescription =
+    selectLocalized(study as any, "description", i18n.language) ??
+    study.description;
 
   return (
     <motion.div 
@@ -107,20 +161,38 @@ const CaseStudyCard = ({ study, index }: { study: CaseStudy, index: number }) =>
       transition={{ duration: 0.6, delay: index * 0.1 }}
       className="h-full"
     >
-      <Card className="neural-card overflow-hidden h-full flex flex-col group cursor-pointer">
+      <Card className="neural-card overflow-hidden h-full flex flex-col group">
         <div className="aspect-[3/4] bg-gradient-to-br from-primary/20 to-secondary/20 relative overflow-hidden">
-          <img src={imageUrl} alt={study.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+          {imageUrl ? (
+            <img src={imageUrl} alt={study.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10">
+              <span className="text-muted-foreground text-sm">No Image</span>
+            </div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
           <div className="absolute bottom-4 left-4 right-4">
             <Badge variant="secondary">Case Study</Badge>
           </div>
         </div>
         <CardContent className="p-6 flex-grow flex flex-col">
-          <h3 className="text-xl font-bold mb-1 group-hover:text-primary transition-colors">{study.title}</h3>
-          <p className="text-sm text-muted-foreground mb-4">Client: <span className="font-medium text-foreground">{study.client}</span></p>
-          <p className="text-muted-foreground text-sm leading-relaxed flex-grow">{study.description.slice(0, 150)}...</p>
+          <h3 className="text-xl font-bold mb-1 group-hover:text-primary transition-colors">
+            {displayTitle}
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Client: <span className="font-medium text-foreground">{displayClient}</span>
+          </p>
+          <p className="text-muted-foreground text-sm leading-relaxed flex-grow">
+            {displayDescription.slice(0, 150)}...
+          </p>
           <div className="mt-auto pt-4">
-            <Button variant="outline" className="btn-ghost-neural w-full">Read More <ArrowRight className="ml-2 h-4 w-4" /></Button>
+            <Button variant="outline" className="btn-ghost-neural w-full" asChild>
+              <Link to={`/case-studies/${study.slug}`}>
+                Read More <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -179,7 +251,6 @@ const CaseStudiesSection = ({ caseStudies, loading }: { caseStudies: CaseStudy[]
     >
       {/* Animated floating orbs - more active at bottom */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Top orb - less movement */}
         <motion.div
           className="absolute w-96 h-96 rounded-full"
           style={{
@@ -214,17 +285,6 @@ const CaseStudiesSection = ({ caseStudies, loading }: { caseStudies: CaseStudy[]
         {/* Bottom orb - more movement and stronger effect */}
         <motion.div
           className="absolute w-[500px] h-[500px] rounded-full"
-          style={{
-            background: 'radial-gradient(circle, hsla(200, 75%, 50%, 0.12) 0%, transparent 60%)',
-            filter: 'blur(60px)',
-            left: '40%',
-            bottom: '-10%',  // نزدیک پایین
-          }}
-          animate={{
-            x: mousePosition.x * 120 - 60,  // حرکت بیشتر در پایین
-            y: -mousePosition.y * 80 + 40,
-          }}
-          transition={{ type: "spring", damping: 25, stiffness: 200 }}
         />
         
         {/* Extra bottom floating element for more dynamics */}
@@ -308,12 +368,34 @@ const ProjectsPage = () => {
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const { setIsHeroVisible } = useLayout();
+  const sentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // ... fetchData logic remains exactly the same ...
     const fetchData = async () => { try { setLoading(true); const [projectsResponse, caseStudiesResponse] = await Promise.all([api.get('/projects'), api.get('/case-studies')]); setCinematicProjects(projectsResponse.data); setCaseStudies(caseStudiesResponse.data); setError(null); } catch (err) { setError('Failed to fetch data. Please check server and database configuration.'); console.error(err); } finally { setLoading(false); } };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0,
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [setIsHeroVisible]);
 
   if (error) { return <div className="h-screen flex items-center justify-center bg-background text-red-500"><p>{error}</p></div>; }
   
@@ -335,7 +417,7 @@ const ProjectsPage = () => {
           </>
         )}
       </div>
-
+      <div ref={sentinelRef} style={{ height: '1px' }} />
       {/* Case Studies Section */}
       <CaseStudiesSection caseStudies={caseStudies} loading={loading} />
     </div>

@@ -5,8 +5,32 @@ const Event = require('../models/EventModel');
 // @access  Private (Admin)
 const createEvent = async (req, res) => {
   try {
-    const { title, date, location, description, boothNumber, registrationUrl } = req.body;
-    const event = await Event.create({ title, date, location, description, boothNumber, registrationUrl });
+    const {
+      title,
+      titleFa,
+      date,
+      location,
+      locationFa,
+      description,
+      descriptionFa,
+      boothNumber,
+      registrationUrl,
+      isActive,
+      imageUrl,
+    } = req.body;
+    const event = await Event.create({
+      title,
+      titleFa,
+      date,
+      location,
+      locationFa,
+      description,
+      descriptionFa,
+      boothNumber,
+      registrationUrl,
+      isActive,
+      imageUrl,
+    });
     res.status(201).json(event);
   } catch (error) {
     res.status(400).json({ message: 'Error creating event', error: error.message });
@@ -15,10 +39,12 @@ const createEvent = async (req, res) => {
 
 // @desc    دریافت تمام رویدادهای فعال
 // @route   GET /api/events
-// @access  Public
+// @access  Public (with admin preview)
 const getActiveEvents = async (req, res) => {
   try {
-    const events = await Event.find({ isActive: true }).sort({ date: 1 });
+    const includeInactive = req.query.all === 'true' && req.user?.isAdmin;
+    const filter = includeInactive ? {} : { isActive: true };
+    const events = await Event.find(filter).sort({ date: 1 });
     res.json(events);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error: error.message });
